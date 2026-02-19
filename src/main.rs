@@ -22,7 +22,7 @@ struct Args {
     #[arg(short, long, default_value = "output.png")]
     output: String,
 
-    #[arg(short, long, default_value_t = 25.0)]
+    #[arg(short, long, default_value_t = 2.0)]
     size: f64,
 
     #[arg(short = 'i', long, default_value_t = 0.8)]
