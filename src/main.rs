@@ -33,6 +33,9 @@ struct Args {
 
     #[arg(long, default_value_t = 1.0)]
     saturation: f64,
+
+    #[arg(short, long, default_value_t = 0.0)]
+    exposure: f64,
 }
 
 struct ArtisticGrainConfig {
@@ -42,6 +45,7 @@ struct ArtisticGrainConfig {
     saturation: f64,
     mix_shadows: f64,
     mix_highlights: f64,
+    exposure: f64,
 }
 
 fn get_luma(p: &Rgb<u8>) -> f64 {
@@ -101,6 +105,11 @@ fn apply_massive_grain(img: &RgbImage, config: &ArtisticGrainConfig) -> RgbImage
             let final_g = grained_luma + config.saturation * (g_grained - grained_luma);
             let final_b = grained_luma + config.saturation * (b_grained - grained_luma);
 
+            let exposure_mult = 2.0_f64.powf(config.exposure);
+            let final_r = (final_r * exposure_mult).clamp(0.0, 1.0);
+            let final_g = (final_g * exposure_mult).clamp(0.0, 1.0);
+            let final_b = (final_b * exposure_mult).clamp(0.0, 1.0);
+
             *pixel = Rgb([
                 (final_r.clamp(0.0, 1.0) * 255.0) as u8,
                 (final_g.clamp(0.0, 1.0) * 255.0) as u8,
@@ -133,6 +142,7 @@ fn main() {
         saturation: args.saturation,
         mix_shadows: 1.0,
         mix_highlights: 0.5,
+        exposure: args.exposure,
     };
 
     let result = apply_massive_grain(&img, &config);
