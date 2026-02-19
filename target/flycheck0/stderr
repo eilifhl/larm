@@ -1,0 +1,76 @@
+   0.043790171s  INFO prepare_target{force=false package_id=larm v0.1.0 (/home/eilif/larm) target="larm"}: cargo::core::compiler::fingerprint: fingerprint error for larm v0.1.0 (/home/eilif/larm)/Check { test: false }/TargetInner { name: "larm", doc: true, ..: with_path("/home/eilif/larm/src/main.rs", Edition2024) }
+   0.043808934s  INFO prepare_target{force=false package_id=larm v0.1.0 (/home/eilif/larm) target="larm"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/eilif/larm/target/debug/.fingerprint/larm-69c95a8914d5b838/bin-larm`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <unknown>
+   1: <unknown>
+   2: <unknown>
+   3: <unknown>
+   4: <unknown>
+   5: <unknown>
+   6: <unknown>
+   7: <unknown>
+   8: <unknown>
+   9: <unknown>
+  10: <unknown>
+  11: <unknown>
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: __libc_start_main
+  16: <unknown>
+   0.044418155s  INFO prepare_target{force=false package_id=clap v4.5.59 target="clap"}: cargo::core::compiler::fingerprint: fingerprint error for clap v4.5.59/Check { test: false }/TargetInner { benched: false, ..: lib_target("clap", ["lib"], "/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/clap-4.5.59/src/lib.rs", Edition2021) }
+   0.044425700s  INFO prepare_target{force=false package_id=clap v4.5.59 target="clap"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/eilif/larm/target/debug/.fingerprint/clap-7edef6b72bafba0d/lib-clap`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <unknown>
+   1: <unknown>
+   2: <unknown>
+   3: <unknown>
+   4: <unknown>
+   5: <unknown>
+   6: <unknown>
+   7: <unknown>
+   8: <unknown>
+   9: <unknown>
+  10: <unknown>
+  11: <unknown>
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: <unknown>
+  16: __libc_start_main
+  17: <unknown>
+   0.047587076s  INFO prepare_target{force=false package_id=larm v0.1.0 (/home/eilif/larm) target="larm"}: cargo::core::compiler::fingerprint: fingerprint error for larm v0.1.0 (/home/eilif/larm)/Check { test: true }/TargetInner { name: "larm", doc: true, ..: with_path("/home/eilif/larm/src/main.rs", Edition2024) }
+   0.047595445s  INFO prepare_target{force=false package_id=larm v0.1.0 (/home/eilif/larm) target="larm"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/eilif/larm/target/debug/.fingerprint/larm-271c7d95835e02d4/test-bin-larm`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <unknown>
+   1: <unknown>
+   2: <unknown>
+   3: <unknown>
+   4: <unknown>
+   5: <unknown>
+   6: <unknown>
+   7: <unknown>
+   8: <unknown>
+   9: <unknown>
+  10: <unknown>
+  11: <unknown>
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: __libc_start_main
+  16: <unknown>
+    Checking clap v4.5.59
+    Checking larm v0.1.0 (/home/eilif/larm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s
