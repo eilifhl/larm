@@ -4,10 +4,10 @@ larm is a film grain/noise generator written in Rust.
 # Examples
 ## 1
 `./larm --size 8.0 --intensity 2.0 --sharpness 20.0 --shadow-grain 2.0 --midtone-grain 2.0 --highlight-grain 2.0 --depth 1.0 --chromatic 6.0 --relief 0.8 --layers 5`
-![[extreme_max_grain.png]]
+![extreme_max_grain.png](./examples/extreme_max_grain.png)
 
 ### Cropped
-![[extreme_max_grain_crop.png]]
+![extreme_max_grain_crop.png](./examples/extreme_max_grain_crop.png)
 
 ## 2
 `./larm --size 4.0 --intensity 1.4 --sharpness 12.0 --shadow-grain 1.6 --midtone-grain 1.2 --highlight-grain 0.6 --depth 0.7 --chromatic 3.5 --relief 0.5 --layers 4`
