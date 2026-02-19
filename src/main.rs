@@ -1,10 +1,12 @@
 extern crate clap;
 extern crate image;
+extern crate indicatif;
 extern crate noise;
 extern crate rayon;
 
 use clap::Parser;
 use image::{Rgb, RgbImage};
+use indicatif::{ProgressBar, ProgressStyle};
 use noise::{NoiseFn, Worley};
 use rayon::prelude::*;
 
@@ -28,12 +30,16 @@ struct Args {
 
     #[arg(long, default_value_t = 8.0)]
     sharpness: f64,
+
+    #[arg(long, default_value_t = 1.0)]
+    saturation: f64,
 }
 
 struct ArtisticGrainConfig {
     size: f64,
     intensity: f64,
     crystal_sharpness: f64,
+    saturation: f64,
     mix_shadows: f64,
     mix_highlights: f64,
 }
@@ -45,6 +51,12 @@ fn get_luma(p: &Rgb<u8>) -> f64 {
 fn apply_massive_grain(img: &RgbImage, config: &ArtisticGrainConfig) -> RgbImage {
     let width = img.width();
     let height = img.height();
+
+    let pb = ProgressBar::new(height as u64);
+    pb.set_style(ProgressStyle::default_bar()
+        .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} rows ({eta})")
+        .unwrap()
+        .progress_chars("#>-"));
 
     let blur_radius = (config.size * 0.5) as f32;
     let base_image = if blur_radius > 0.5 {
@@ -73,28 +85,42 @@ fn apply_massive_grain(img: &RgbImage, config: &ArtisticGrainConfig) -> RgbImage
                 1.0 * config.mix_shadows
             };
 
-            let apply_channel = |c_in: u8| -> u8 {
+            let apply_grain_logic = |c_in: u8| -> f64 {
                 let c_float = c_in as f64 / 255.0;
                 let grain_delta = (grain_shape - 0.5) * 2.0;
-                let result = c_float + (grain_delta * config.intensity * mask);
-                (result.clamp(0.0, 1.0) * 255.0) as u8
+                c_float + (grain_delta * config.intensity * mask)
             };
 
+            let r_grained = apply_grain_logic(original_pixel[0]);
+            let g_grained = apply_grain_logic(original_pixel[1]);
+            let b_grained = apply_grain_logic(original_pixel[2]);
+
+            let grained_luma = 0.2126 * r_grained + 0.7152 * g_grained + 0.0722 * b_grained;
+
+            let final_r = grained_luma + config.saturation * (r_grained - grained_luma);
+            let final_g = grained_luma + config.saturation * (g_grained - grained_luma);
+            let final_b = grained_luma + config.saturation * (b_grained - grained_luma);
+
             *pixel = Rgb([
-                apply_channel(original_pixel[0]),
-                apply_channel(original_pixel[1]),
-                apply_channel(original_pixel[2]),
+                (final_r.clamp(0.0, 1.0) * 255.0) as u8,
+                (final_g.clamp(0.0, 1.0) * 255.0) as u8,
+                (final_b.clamp(0.0, 1.0) * 255.0) as u8,
             ]);
+
+            if x == width - 1 {
+                pb.inc(1);
+            }
         },
     );
 
+    pb.finish_with_message("Grain applied successfully!");
     buffer
 }
 
 fn main() {
     let args = Args::parse();
 
-    println!("Processing: {}", args.input);
+    println!("Opening: {}", args.input);
 
     let img = image::open(&args.input)
         .expect("Failed to open input image")
@@ -104,14 +130,15 @@ fn main() {
         size: args.size,
         intensity: args.intensity,
         crystal_sharpness: args.sharpness,
+        saturation: args.saturation,
         mix_shadows: 1.0,
         mix_highlights: 0.5,
     };
 
     let result = apply_massive_grain(&img, &config);
 
+    println!("Saving to: {}", args.output);
     result
         .save(&args.output)
         .expect("Failed to save output image");
-    println!("Saved to: {}", args.output);
 }
