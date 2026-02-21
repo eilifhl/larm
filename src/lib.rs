@@ -1,10 +1,8 @@
 extern crate image;
-extern crate indicatif;
 extern crate noise;
 extern crate rayon;
 
 use image::{Rgb, RgbImage};
-use indicatif::{ProgressBar, ProgressStyle};
 use noise::{Fbm, NoiseFn, Perlin, SuperSimplex};
 use rayon::prelude::*;
 
@@ -173,11 +171,6 @@ impl GrainEngine {
 fn apply_3d_grain(img: &RgbImage, config: &ArtisticGrainConfig) -> RgbImage {
     let (width, height) = img.dimensions();
 
-    let pb = ProgressBar::new(height as u64);
-    pb.set_style(ProgressStyle::default_bar()
-        .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} rows ({eta})")
-        .unwrap());
-
     let blur_radius = (config.size * 0.3) as f32;
     let base_image = if blur_radius > 0.5 {
         image::imageops::blur(img, blur_radius)
@@ -232,13 +225,8 @@ fn apply_3d_grain(img: &RgbImage, config: &ArtisticGrainConfig) -> RgbImage {
             let b = (out_luma + config.saturation * (rgb_f[2] - out_luma)).clamp(0.0, 1.0);
 
             *pixel = Rgb([(r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8]);
-
-            if x == width - 1 {
-                pb.inc(1);
-            }
         },
     );
 
-    pb.finish_with_message("3D Grain complete.");
     buffer
 }
