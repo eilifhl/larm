@@ -2,7 +2,7 @@ extern crate image;
 extern crate noise;
 extern crate rayon;
 
-use image::{Rgb, RgbImage};
+use image::{GenericImageView, Rgb};
 use noise::{Fbm, NoiseFn, Perlin, SuperSimplex};
 use rayon::prelude::*;
 
@@ -168,65 +168,83 @@ impl GrainEngine {
     }
 }
 
-fn apply_3d_grain(img: &RgbImage, config: &ArtisticGrainConfig) -> RgbImage {
-    let (width, height) = img.dimensions();
+pub fn apply_3d_grain(
+    width: u32,
+    height: u32,
+    input_pixels: &[u8],
+    output_pixels: &mut [u8],
+    config: &ArtisticGrainConfig,
+) {
+    let input_view = image::ImageBuffer::<Rgb<u8>, &[u8]>::from_raw(width, height, input_pixels)
+        .expect("Input buffer size does not match width * height * 3");
 
     let blur_radius = (config.size * 0.3) as f32;
-    let base_image = if blur_radius > 0.5 {
-        image::imageops::blur(img, blur_radius)
+
+    if blur_radius > 0.5 {
+        let blurred = image::imageops::blur(&input_view, blur_radius);
+        process_grain(&blurred, width, output_pixels, config);
     } else {
-        img.clone()
-    };
+        process_grain(&input_view, width, output_pixels, config);
+    }
+}
 
-    let mut buffer = RgbImage::new(width, height);
+fn process_grain<I>(base_image: &I, width: u32, output_pixels: &mut [u8], config: &ArtisticGrainConfig)
+where
+    I: GenericImageView<Pixel = Rgb<u8>> + Sync,
+{
+    output_pixels
+        .par_chunks_exact_mut(3)
+        .enumerate()
+        .for_each_init(
+            || GrainEngine::new(config.layers, 42),
+            |grain_3d, (index, pixel_out)| {
+                let x = (index as u32) % width;
+                let y = (index as u32) / width;
 
-    buffer.enumerate_pixels_mut().par_bridge().for_each_init(
-        || GrainEngine::new(config.layers, 42),
-        |grain_3d, (x, y, pixel)| {
-            let original_pixel = base_image.get_pixel(x, y);
-            let luma = get_luma(original_pixel);
+                let original_pixel = base_image.get_pixel(x, y);
+                let luma = get_luma(&original_pixel);
 
-            let x_f = x as f64;
-            let y_f = y as f64;
+                let x_f = x as f64;
+                let y_f = y as f64;
 
-            let channel_grains = grain_3d.sample(x_f, y_f, luma, config);
+                let channel_grains = grain_3d.sample(x_f, y_f, luma, config);
 
-            let tonal_intensity = config.get_tonal_grain_intensity(luma);
-            let effective_intensity = config.intensity * tonal_intensity;
+                let tonal_intensity = config.get_tonal_grain_intensity(luma);
+                let effective_intensity = config.intensity * tonal_intensity;
 
-            let soft_light = |c: f64, g: f64| -> f64 {
-                if g < 0.5 {
-                    c - (1.0 - 2.0 * g) * c * (1.0 - c)
-                } else {
-                    c + (2.0 * g - 1.0)
-                        * ((if c <= 0.25 {
-                            ((16.0 * c - 12.0) * c + 4.0) * c
-                        } else {
-                            c.sqrt()
-                        }) - c)
+                let soft_light = |c: f64, g: f64| -> f64 {
+                    if g < 0.5 {
+                        c - (1.0 - 2.0 * g) * c * (1.0 - c)
+                    } else {
+                        c + (2.0 * g - 1.0)
+                            * ((if c <= 0.25 {
+                                ((16.0 * c - 12.0) * c + 4.0) * c
+                            } else {
+                                c.sqrt()
+                            }) - c)
+                    }
+                };
+
+                let exposure_mult = 2.0_f64.powf(config.exposure);
+                let mut rgb_f = [0.0; 3];
+
+                for i in 0..3 {
+                    let c_orig = original_pixel[i] as f64 / 255.0;
+
+                    let grain_shape = 0.5 + channel_grains[i] * effective_intensity;
+                    let grained = soft_light(c_orig, grain_shape);
+
+                    rgb_f[i] = (grained * exposure_mult).clamp(0.0, 1.0);
                 }
-            };
 
-            let exposure_mult = 2.0_f64.powf(config.exposure);
-            let mut rgb_f = [0.0; 3];
+                let out_luma = 0.2126 * rgb_f[0] + 0.7152 * rgb_f[1] + 0.0722 * rgb_f[2];
+                let r = (out_luma + config.saturation * (rgb_f[0] - out_luma)).clamp(0.0, 1.0);
+                let g = (out_luma + config.saturation * (rgb_f[1] - out_luma)).clamp(0.0, 1.0);
+                let b = (out_luma + config.saturation * (rgb_f[2] - out_luma)).clamp(0.0, 1.0);
 
-            for i in 0..3 {
-                let c_orig = original_pixel[i] as f64 / 255.0;
-
-                let grain_shape = 0.5 + channel_grains[i] * effective_intensity;
-                let grained = soft_light(c_orig, grain_shape);
-
-                rgb_f[i] = (grained * exposure_mult).clamp(0.0, 1.0);
-            }
-
-            let out_luma = 0.2126 * rgb_f[0] + 0.7152 * rgb_f[1] + 0.0722 * rgb_f[2];
-            let r = (out_luma + config.saturation * (rgb_f[0] - out_luma)).clamp(0.0, 1.0);
-            let g = (out_luma + config.saturation * (rgb_f[1] - out_luma)).clamp(0.0, 1.0);
-            let b = (out_luma + config.saturation * (rgb_f[2] - out_luma)).clamp(0.0, 1.0);
-
-            *pixel = Rgb([(r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8]);
-        },
-    );
-
-    buffer
+                pixel_out[0] = (r * 255.0) as u8;
+                pixel_out[1] = (g * 255.0) as u8;
+                pixel_out[2] = (b * 255.0) as u8;
+            },
+        );
 }
