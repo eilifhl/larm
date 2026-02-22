@@ -1,0 +1,45 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"default\", \"unicode-width\", \"wasmbind\"]",
+  "declared_features": "[\"default\", \"futures\", \"improved_unicode\", \"in_memory\", \"rayon\", \"tokio\", \"unicode-segmentation\", \"unicode-width\", \"vt100\", \"wasmbind\"]",
+  "target": 10301169156738538477,
+  "profile": 15657897354478470176,
+  "path": 10434671799396137516,
+  "deps": [
+    [
+      3150877306605016308,
+      "unit_prefix",
+      false,
+      5090718379091987834
+    ],
+    [
+      12477614435278575751,
+      "console",
+      false,
+      10342218624734527860
+    ],
+    [
+      16173631546844793784,
+      "unicode_width",
+      false,
+      7266241757632201880
+    ],
+    [
+      17182706001892993570,
+      "portable_atomic",
+      false,
+      631720637603041328
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/indicatif-22710afe626f3cdc/dep-lib-indicatif",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

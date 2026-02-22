@@ -1,0 +1,69 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"bracketed-paste\", \"default\", \"derive-more\", \"events\", \"windows\"]",
+  "declared_features": "[\"bracketed-paste\", \"default\", \"derive-more\", \"event-stream\", \"events\", \"filedescriptor\", \"libc\", \"osc52\", \"serde\", \"use-dev-tty\", \"windows\"]",
+  "target": 7162149947039624270,
+  "profile": 2241668132362809309,
+  "path": 10200433832553880665,
+  "deps": [
+    [
+      595566797399950287,
+      "derive_more",
+      false,
+      16266950223845682002
+    ],
+    [
+      826480799056633171,
+      "document_features",
+      false,
+      14894205383111279780
+    ],
+    [
+      4627466251042474366,
+      "signal_hook_mio",
+      false,
+      9700635835123380475
+    ],
+    [
+      9156379307790651767,
+      "mio",
+      false,
+      6289898294837704561
+    ],
+    [
+      12459942763388630573,
+      "parking_lot",
+      false,
+      5460488272684197509
+    ],
+    [
+      16909888598953886583,
+      "bitflags",
+      false,
+      15767011457452967420
+    ],
+    [
+      17154765528929363175,
+      "signal_hook",
+      false,
+      1121640032262141164
+    ],
+    [
+      18377328279789821306,
+      "rustix",
+      false,
+      13927337337209143904
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/crossterm-90c809d9f6bfbdcf/dep-lib-crossterm",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

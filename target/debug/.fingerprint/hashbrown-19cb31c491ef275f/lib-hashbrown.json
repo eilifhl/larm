@@ -1,0 +1,39 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"allocator-api2\", \"default\", \"default-hasher\", \"equivalent\", \"inline-more\", \"raw-entry\"]",
+  "declared_features": "[\"alloc\", \"allocator-api2\", \"core\", \"default\", \"default-hasher\", \"equivalent\", \"inline-more\", \"nightly\", \"raw-entry\", \"rayon\", \"rustc-dep-of-std\", \"rustc-internal-api\", \"serde\"]",
+  "target": 13796197676120832388,
+  "profile": 2241668132362809309,
+  "path": 675960266554314462,
+  "deps": [
+    [
+      2981812677314478936,
+      "foldhash",
+      false,
+      15237901369795571850
+    ],
+    [
+      5230392855116717286,
+      "equivalent",
+      false,
+      10185148278783501437
+    ],
+    [
+      9150530836556604396,
+      "allocator_api2",
+      false,
+      1059871836919996997
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/hashbrown-19cb31c491ef275f/dep-lib-hashbrown",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

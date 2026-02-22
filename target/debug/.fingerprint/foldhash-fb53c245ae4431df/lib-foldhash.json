@@ -1,0 +1,20 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[]",
+  "declared_features": "[\"default\", \"nightly\", \"std\"]",
+  "target": 18077926938045032029,
+  "profile": 2241668132362809309,
+  "path": 776309892206765197,
+  "deps": [],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/foldhash-fb53c245ae4431df/dep-lib-foldhash",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

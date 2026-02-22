@@ -1,0 +1,27 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"default\", \"hashbrown\"]",
+  "declared_features": "[\"default\", \"hashbrown\", \"nightly\"]",
+  "target": 4146745191327733199,
+  "profile": 15657897354478470176,
+  "path": 13358010820072371433,
+  "deps": [
+    [
+      17037126617600641945,
+      "hashbrown",
+      false,
+      2620273192527334461
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/lru-79a73b0aeed53d8a/dep-lib-lru",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

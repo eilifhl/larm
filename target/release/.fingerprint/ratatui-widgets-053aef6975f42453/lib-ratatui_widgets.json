@@ -1,0 +1,87 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"all-widgets\", \"calendar\", \"default\", \"std\"]",
+  "declared_features": "[\"all-widgets\", \"calendar\", \"default\", \"document-features\", \"serde\", \"std\", \"unstable\", \"unstable-rendered-line-info\"]",
+  "target": 14391636923849786901,
+  "profile": 8544103335144359447,
+  "path": 18106731407609588435,
+  "deps": [
+    [
+      1232198224951696867,
+      "unicode_segmentation",
+      false,
+      10162908808649623544
+    ],
+    [
+      3108565608554636492,
+      "instability",
+      false,
+      10127339611495548478
+    ],
+    [
+      4798166361575373780,
+      "line_clipping",
+      false,
+      18180302254333962928
+    ],
+    [
+      6313753598130717437,
+      "strum",
+      false,
+      16039207178588879804
+    ],
+    [
+      11432222519274906849,
+      "time",
+      false,
+      15677422077409291527
+    ],
+    [
+      12384053596681121488,
+      "ratatui_core",
+      false,
+      18125798372916118887
+    ],
+    [
+      12510082137273275812,
+      "indoc",
+      false,
+      14686336773887167088
+    ],
+    [
+      16173631546844793784,
+      "unicode_width",
+      false,
+      12808767312716597673
+    ],
+    [
+      16326338539882746041,
+      "itertools",
+      false,
+      695464870401499363
+    ],
+    [
+      16909888598953886583,
+      "bitflags",
+      false,
+      14807267197769584008
+    ],
+    [
+      17037126617600641945,
+      "hashbrown",
+      false,
+      1908845859105766167
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "release/.fingerprint/ratatui-widgets-053aef6975f42453/dep-lib-ratatui_widgets",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

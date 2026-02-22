@@ -1,0 +1,20 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[]",
+  "declared_features": "[\"unstable\"]",
+  "target": 18397703399226382178,
+  "profile": 2225463790103693989,
+  "path": 853663591030145258,
+  "deps": [],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/cesu8-8bf9c55ab86df55e/dep-lib-cesu8",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

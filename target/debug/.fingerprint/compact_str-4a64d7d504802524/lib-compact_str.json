@@ -1,0 +1,57 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"std\"]",
+  "declared_features": "[\"arbitrary\", \"borsh\", \"bytes\", \"default\", \"diesel\", \"markup\", \"proptest\", \"quickcheck\", \"rkyv\", \"serde\", \"smallvec\", \"sqlx\", \"sqlx-mysql\", \"sqlx-postgres\", \"sqlx-sqlite\", \"std\", \"zeroize\"]",
+  "target": 7968499388442294171,
+  "profile": 15657897354478470176,
+  "path": 2818690264359045796,
+  "deps": [
+    [
+      1127187624154154345,
+      "castaway",
+      false,
+      3987546511762681596
+    ],
+    [
+      6400797066282925533,
+      "ryu",
+      false,
+      4753962805537217706
+    ],
+    [
+      7667230146095136825,
+      "cfg_if",
+      false,
+      15317396275627761595
+    ],
+    [
+      9938278000850417404,
+      "itoa",
+      false,
+      2601862084202415220
+    ],
+    [
+      13785866025199020095,
+      "static_assertions",
+      false,
+      15580259447905118442
+    ],
+    [
+      14156967978702956262,
+      "rustversion",
+      false,
+      639066699622490586
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/compact_str-4a64d7d504802524/dep-lib-compact_str",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

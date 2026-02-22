@@ -1,0 +1,12 @@
+/home/eilif/larm/target/debug/deps/jni_macros-991bc6bf2deefc46.d: /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/lib.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/bind_java_type.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/mangle.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/native_method.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/signature.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/str.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/types.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/utils.rs
+
+/home/eilif/larm/target/debug/deps/libjni_macros-991bc6bf2deefc46.so: /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/lib.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/bind_java_type.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/mangle.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/native_method.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/signature.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/str.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/types.rs /home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/utils.rs
+
+/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/lib.rs:
+/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/bind_java_type.rs:
+/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/mangle.rs:
+/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/native_method.rs:
+/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/signature.rs:
+/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/str.rs:
+/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/types.rs:
+/home/eilif/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/jni-macros-0.22.0/src/utils.rs:

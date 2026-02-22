@@ -1,0 +1,27 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"default\"]",
+  "declared_features": "[\"default\", \"invocation\"]",
+  "target": 2835126046236718539,
+  "profile": 2225463790103693989,
+  "path": 6693021305737302992,
+  "deps": [
+    [
+      15622660310229662834,
+      "walkdir",
+      false,
+      4053824057350502516
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/jni-7bcf7fe9b5a8538d/dep-build-script-build-script-build",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

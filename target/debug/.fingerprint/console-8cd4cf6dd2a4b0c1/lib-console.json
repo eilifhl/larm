@@ -1,0 +1,39 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"alloc\", \"ansi-parsing\", \"std\", \"unicode-width\"]",
+  "declared_features": "[\"alloc\", \"ansi-parsing\", \"default\", \"std\", \"unicode-width\", \"windows-console-colors\"]",
+  "target": 7600203407108534355,
+  "profile": 15657897354478470176,
+  "path": 6440913495797545312,
+  "deps": [
+    [
+      3722963349756955755,
+      "once_cell",
+      false,
+      1479525353209343148
+    ],
+    [
+      16173631546844793784,
+      "unicode_width",
+      false,
+      7266241757632201880
+    ],
+    [
+      18365559012052052344,
+      "libc",
+      false,
+      11082285186619175427
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/console-8cd4cf6dd2a4b0c1/dep-lib-console",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

@@ -1,0 +1,33 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"std\"]",
+  "declared_features": "[\"default\", \"document-features\", \"portable-atomic\", \"std\"]",
+  "target": 9002834770236403302,
+  "profile": 15657897354478470176,
+  "path": 9648001060948180904,
+  "deps": [
+    [
+      2448563160050429386,
+      "thiserror",
+      false,
+      18006848837407931179
+    ],
+    [
+      17037126617600641945,
+      "hashbrown",
+      false,
+      2620273192527334461
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/kasuari-64eb831db29bfd23/dep-lib-kasuari",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

@@ -1,0 +1,45 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"crossterm_0_29\", \"default\", \"underline-color\"]",
+  "declared_features": "[\"crossterm_0_28\", \"crossterm_0_29\", \"default\", \"document-features\", \"scrolling-regions\", \"serde\", \"underline-color\", \"unstable\", \"unstable-backend-writer\"]",
+  "target": 872565748012871698,
+  "profile": 8544103335144359447,
+  "path": 13913711368091149294,
+  "deps": [
+    [
+      2578702214067455438,
+      "crossterm_0_29",
+      false,
+      18146637530953086898
+    ],
+    [
+      3108565608554636492,
+      "instability",
+      false,
+      10127339611495548478
+    ],
+    [
+      7667230146095136825,
+      "cfg_if",
+      false,
+      1596695234590166591
+    ],
+    [
+      12384053596681121488,
+      "ratatui_core",
+      false,
+      18125798372916118887
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "release/.fingerprint/ratatui-crossterm-d665184ac8c31391/dep-lib-ratatui_crossterm",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

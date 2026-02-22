@@ -1,0 +1,27 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[]",
+  "declared_features": "[]",
+  "target": 3552558796056091662,
+  "profile": 2225463790103693989,
+  "path": 13438121195717834098,
+  "deps": [
+    [
+      11781824977070132858,
+      "same_file",
+      false,
+      14149166197069952650
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/walkdir-f4fa57bd2f831250/dep-lib-walkdir",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}
