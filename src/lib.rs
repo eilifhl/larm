@@ -1,4 +1,5 @@
 extern crate image;
+extern crate jni;
 extern crate noise;
 extern crate rayon;
 
@@ -6,7 +7,7 @@ use image::{GenericImageView, Rgb};
 use noise::{Fbm, NoiseFn, Perlin, SuperSimplex};
 use rayon::prelude::*;
 
-struct ArtisticGrainConfig {
+pub struct ArtisticGrainConfig {
     size: f64,
     intensity: f64,
     crystal_sharpness: f64,
@@ -188,8 +189,12 @@ pub fn apply_3d_grain(
     }
 }
 
-fn process_grain<I>(base_image: &I, width: u32, output_pixels: &mut [u8], config: &ArtisticGrainConfig)
-where
+fn process_grain<I>(
+    base_image: &I,
+    width: u32,
+    output_pixels: &mut [u8],
+    config: &ArtisticGrainConfig,
+) where
     I: GenericImageView<Pixel = Rgb<u8>> + Sync,
 {
     output_pixels
@@ -247,4 +252,71 @@ where
                 pixel_out[2] = (b * 255.0) as u8;
             },
         );
+}
+
+use jni::objects::{JByteBuffer, JClass};
+use jni::sys::{jdouble, jint};
+use jni::EnvUnowned;
+
+#[unsafe(no_mangle)]
+pub extern "system" fn Java_com_example_app_GrainProcessor_applyGrain<'local>(
+    mut env_unowned: EnvUnowned<'local>,
+    _class: JClass<'local>,
+    input_buf: JByteBuffer<'local>,
+    output_buf: JByteBuffer<'local>,
+    width: jint,
+    height: jint,
+
+    // ArtisticGrainConfig
+    size: jdouble,
+    intensity: jdouble,
+    crystal_sharpness: jdouble,
+    saturation: jdouble,
+    exposure: jdouble,
+    shadow_grain: jdouble,
+    midtone_grain: jdouble,
+    highlight_grain: jdouble,
+    tonal_smoothness: jdouble,
+    depth: jdouble,
+    chromatic: jdouble,
+    relief: jdouble,
+    layers: jint,
+) {
+    env_unowned
+        .with_env(|env| -> jni::errors::Result<()> {
+            let input_ptr = env.get_direct_buffer_address(&input_buf)?;
+            let input_len = env.get_direct_buffer_capacity(&input_buf)?;
+            let input_slice = unsafe { std::slice::from_raw_parts(input_ptr, input_len) };
+
+            let output_ptr = env.get_direct_buffer_address(&output_buf)?;
+            let output_len = env.get_direct_buffer_capacity(&output_buf)?;
+            let output_slice = unsafe { std::slice::from_raw_parts_mut(output_ptr, output_len) };
+
+            let config = ArtisticGrainConfig {
+                size: size as f64,
+                intensity: intensity as f64,
+                crystal_sharpness: crystal_sharpness as f64,
+                saturation: saturation as f64,
+                exposure: exposure as f64,
+                shadow_grain: shadow_grain as f64,
+                midtone_grain: midtone_grain as f64,
+                highlight_grain: highlight_grain as f64,
+                tonal_smoothness: tonal_smoothness as f64,
+                depth: depth as f64,
+                chromatic: chromatic as f64,
+                relief: relief as f64,
+                layers: layers as u32,
+            };
+
+            apply_3d_grain(
+                width as u32,
+                height as u32,
+                input_slice,
+                output_slice,
+                &config,
+            );
+
+            Ok(())
+        })
+        .resolve::<jni::errors::ThrowRuntimeExAndDefault>();
 }
