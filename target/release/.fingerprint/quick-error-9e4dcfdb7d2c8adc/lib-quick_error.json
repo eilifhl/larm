@@ -1,0 +1,20 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[]",
+  "declared_features": "[]",
+  "target": 9418707758664623327,
+  "profile": 2040997289075261528,
+  "path": 1546434838159495855,
+  "deps": [],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "release/.fingerprint/quick-error-9e4dcfdb7d2c8adc/dep-lib-quick_error",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

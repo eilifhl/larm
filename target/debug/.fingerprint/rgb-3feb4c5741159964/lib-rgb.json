@@ -1,0 +1,20 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[]",
+  "declared_features": "[\"argb\", \"as-bytes\", \"bytemuck\", \"checked_fns\", \"default\", \"defmt-03\", \"grb\", \"serde\", \"unstable-experimental\"]",
+  "target": 15506589765627917386,
+  "profile": 2241668132362809309,
+  "path": 18151722191387941519,
+  "deps": [],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/rgb-3feb4c5741159964/dep-lib-rgb",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

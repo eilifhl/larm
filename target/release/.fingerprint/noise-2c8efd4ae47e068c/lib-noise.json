@@ -1,0 +1,39 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"default\", \"std\"]",
+  "declared_features": "[\"default\", \"image\", \"images\", \"std\"]",
+  "target": 8653222797858346211,
+  "profile": 2040997289075261528,
+  "path": 3681756666959266883,
+  "deps": [
+    [
+      5157631553186200874,
+      "num_traits",
+      false,
+      14787791808780729904
+    ],
+    [
+      13208667028893622512,
+      "rand",
+      false,
+      17728839071325180826
+    ],
+    [
+      16658906400288386541,
+      "rand_xorshift",
+      false,
+      14418826056045991105
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "release/.fingerprint/noise-2c8efd4ae47e068c/dep-lib-noise",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

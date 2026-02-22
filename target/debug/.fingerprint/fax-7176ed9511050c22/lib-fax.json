@@ -1,0 +1,27 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[]",
+  "declared_features": "[\"debug\"]",
+  "target": 1089503997142669903,
+  "profile": 15657897354478470176,
+  "path": 12169606487382466669,
+  "deps": [
+    [
+      16896555084957406727,
+      "fax_derive",
+      false,
+      13794921831430351529
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/fax-7176ed9511050c22/dep-lib-fax",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

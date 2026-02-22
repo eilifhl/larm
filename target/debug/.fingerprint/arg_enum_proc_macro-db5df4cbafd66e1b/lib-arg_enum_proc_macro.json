@@ -1,0 +1,39 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[]",
+  "declared_features": "[]",
+  "target": 3872014975303061944,
+  "profile": 2225463790103693989,
+  "path": 11369207990960958383,
+  "deps": [
+    [
+      4289358735036141001,
+      "proc_macro2",
+      false,
+      1589503505859930677
+    ],
+    [
+      6100504282945712449,
+      "quote",
+      false,
+      249754538739964438
+    ],
+    [
+      10332730653136212148,
+      "syn",
+      false,
+      9787333216654662755
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/arg_enum_proc_macro-db5df4cbafd66e1b/dep-lib-arg_enum_proc_macro",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

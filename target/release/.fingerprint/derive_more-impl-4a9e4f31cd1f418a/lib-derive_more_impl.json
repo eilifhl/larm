@@ -1,0 +1,45 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"default\", \"is_variant\"]",
+  "declared_features": "[\"add\", \"add_assign\", \"as_ref\", \"constructor\", \"debug\", \"default\", \"deref\", \"deref_mut\", \"display\", \"eq\", \"error\", \"from\", \"from_str\", \"full\", \"index\", \"index_mut\", \"into\", \"into_iterator\", \"is_variant\", \"mul\", \"mul_assign\", \"not\", \"sum\", \"testing-helpers\", \"try_from\", \"try_into\", \"try_unwrap\", \"unwrap\"]",
+  "target": 11796376952621915773,
+  "profile": 3243393744032016585,
+  "path": 9754017598955496142,
+  "deps": [
+    [
+      4289358735036141001,
+      "proc_macro2",
+      false,
+      3691556239466489253
+    ],
+    [
+      6100504282945712449,
+      "quote",
+      false,
+      11494807622801945056
+    ],
+    [
+      9503536157163433714,
+      "convert_case",
+      false,
+      18059473847723222246
+    ],
+    [
+      10332730653136212148,
+      "syn",
+      false,
+      12090003282346220311
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "release/.fingerprint/derive_more-impl-4a9e4f31cd1f418a/dep-lib-derive_more_impl",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

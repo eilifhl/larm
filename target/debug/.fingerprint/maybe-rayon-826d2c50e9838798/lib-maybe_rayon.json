@@ -1,0 +1,33 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"rayon\", \"threads\"]",
+  "declared_features": "[\"default\", \"rayon\", \"threads\"]",
+  "target": 15564772949311995899,
+  "profile": 15657897354478470176,
+  "path": 2759210960246000727,
+  "deps": [
+    [
+      7667230146095136825,
+      "cfg_if",
+      false,
+      15317396275627761595
+    ],
+    [
+      14807177696891839338,
+      "rayon",
+      false,
+      2549615655768641580
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/maybe-rayon-826d2c50e9838798/dep-lib-maybe_rayon",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

@@ -1,0 +1,45 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"color\", \"error-context\", \"help\", \"std\", \"suggestions\", \"usage\"]",
+  "declared_features": "[\"cargo\", \"color\", \"debug\", \"default\", \"deprecated\", \"env\", \"error-context\", \"help\", \"std\", \"string\", \"suggestions\", \"unicode\", \"unstable-doc\", \"unstable-ext\", \"unstable-styles\", \"unstable-v5\", \"usage\", \"wrap_help\"]",
+  "target": 6917651628887788201,
+  "profile": 422155425158412511,
+  "path": 7803252735120579165,
+  "deps": [
+    [
+      815705504764238973,
+      "anstream",
+      false,
+      6753446989351347528
+    ],
+    [
+      7483871650937086505,
+      "anstyle",
+      false,
+      2933191491955008124
+    ],
+    [
+      11166530783118767604,
+      "strsim",
+      false,
+      7629601824361576406
+    ],
+    [
+      17993127834942092682,
+      "clap_lex",
+      false,
+      492154489128226767
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "release/.fingerprint/clap_builder-ee809941a22890d7/dep-lib-clap_builder",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}

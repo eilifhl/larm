@@ -1,0 +1,39 @@
+{
+  "rustc": 14586432835443788270,
+  "features": "[\"rng\"]",
+  "declared_features": "[\"cipher\", \"default\", \"legacy\", \"rng\", \"xchacha\", \"zeroize\"]",
+  "target": 5186012452570817782,
+  "profile": 9318172923473070351,
+  "path": 7444612941338568203,
+  "deps": [
+    [
+      7667230146095136825,
+      "cfg_if",
+      false,
+      2130727601257642822
+    ],
+    [
+      15529777797982113006,
+      "rand_core",
+      false,
+      1005402301162647944
+    ],
+    [
+      16378603989457970572,
+      "cpufeatures",
+      false,
+      14980455016790321687
+    ]
+  ],
+  "local": [
+    {
+      "CheckDepInfo": {
+        "dep_info": "debug/.fingerprint/chacha20-fcf6b7e4a6666900/dep-lib-chacha20",
+        "checksum": false
+      }
+    }
+  ],
+  "rustflags": [],
+  "config": 2069994364910194474,
+  "compile_kind": 0
+}
