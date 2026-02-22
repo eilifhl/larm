@@ -62,7 +62,6 @@ object ImageProcessingService {
                 bytes[idx++] = ((argb shr 16) and 0xFF).toByte() // R
                 bytes[idx++] = ((argb shr 8) and 0xFF).toByte()  // G
                 bytes[idx++] = (argb and 0xFF).toByte()          // B
-                // NO ALPHA
             }
         }
         return bytes

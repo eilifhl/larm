@@ -14,7 +14,6 @@ private val logger = LoggerFactory.getLogger("Routing")
 
 fun Application.configureRouting() {
     routing {
-        // Serve static files from resources/static
         staticResources("/", "static")
 
         get("/health") {

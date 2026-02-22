@@ -55,7 +55,6 @@ object ImageStore {
      */
     private fun createProxy(original: BufferedImage): BufferedImage {
         if (original.width <= MAX_PROXY_WIDTH) {
-            // Image is already small enough, return a copy
             return copyImage(original)
         }
 
@@ -89,7 +88,6 @@ object ImageStore {
     fun toJpegBytes(image: BufferedImage, quality: Float = 0.85f): ByteArray {
         val output = ByteArrayOutputStream()
 
-        // Convert to RGB if necessary (JPEG doesn't support alpha)
         val rgbImage = if (image.type == BufferedImage.TYPE_INT_ARGB) {
             val rgb = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB)
             val g2d = rgb.createGraphics()
