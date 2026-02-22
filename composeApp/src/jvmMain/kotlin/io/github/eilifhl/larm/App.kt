@@ -14,6 +14,8 @@ import java.io.File
 import javax.imageio.ImageIO
 import java.nio.ByteBuffer
 import kotlin.math.roundToInt
+import java.awt.FileDialog
+import java.awt.Frame
 
 data class GrainParams(
     val size: Float = 2.5f,
@@ -37,8 +39,9 @@ data class GrainParams(
 fun App() {
     MaterialTheme {
         var params by remember { mutableStateOf(GrainParams()) }
-        var status by remember { mutableStateOf("Ready") }
+        var status by remember { mutableStateOf("Select an image to begin") }
         var isProcessing by remember { mutableStateOf(false) }
+        var selectedFile by remember { mutableStateOf<File?>(null) }
 
         Row(modifier = Modifier.fillMaxSize()) {
 
@@ -81,16 +84,38 @@ fun App() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                Button(
+                    onClick = {
+                        val file = openFileDialog()
+                        if (file != null) {
+                            selectedFile = file
+                            status = "Selected: ${file.name}"
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+                ) {
+                    Text(if (selectedFile == null) "Select Image" else "Change Image")
+                }
+
+                Text(
+                    text = selectedFile?.path ?: "No file selected",
+                    style = MaterialTheme.typography.caption,
+                    modifier = Modifier.padding(bottom = 20.dp)
+                )
+
                 Text(status, modifier = Modifier.padding(bottom = 20.dp))
 
                 Button(
-                    enabled = !isProcessing,
+                    enabled = !isProcessing && selectedFile != null,
                     onClick = {
                         isProcessing = true
                         status = "Processing..."
+
+                        val fileToProcess = selectedFile!!
+
                         Thread {
                             try {
-                                processImage(params)
+                                processImage(fileToProcess, params)
                                 status = "Done! Saved to output_compose.png"
                             } catch (e: Exception) {
                                 status = "Error: ${e.message}"
@@ -106,6 +131,18 @@ fun App() {
                 }
             }
         }
+    }
+}
+
+fun openFileDialog(): File? {
+    val dialog = FileDialog(null as Frame?, "Select Image", FileDialog.LOAD)
+    dialog.file = "*.jpg;*.png;*.jpeg"
+    dialog.isVisible = true
+
+    return if (dialog.file != null) {
+        File(dialog.directory, dialog.file)
+    } else {
+        null
     }
 }
 
@@ -145,8 +182,8 @@ fun SectionHeader(title: String) {
     Divider()
 }
 
-fun processImage(params: GrainParams) {
-    val inputImage = ImageIO.read(File("input.jpg")) ?: throw Exception("input.jpg not found")
+fun processImage(inputFile: File, params: GrainParams) {
+    val inputImage = ImageIO.read(inputFile) ?: throw Exception("Could not read image")
     val width = inputImage.width
     val height = inputImage.height
     val byteSize = width * height * 3
