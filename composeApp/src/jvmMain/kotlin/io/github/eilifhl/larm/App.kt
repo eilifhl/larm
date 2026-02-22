@@ -1,5 +1,6 @@
 package io.github.eilifhl.larm
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -7,15 +8,26 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.awt.image.BufferedImage
 import java.io.File
-import javax.imageio.ImageIO
 import java.nio.ByteBuffer
-import kotlin.math.roundToInt
+import javax.imageio.ImageIO
 import java.awt.FileDialog
 import java.awt.Frame
+import kotlin.math.roundToInt
 
 data class GrainParams(
     val size: Float = 2.5f,
@@ -35,16 +47,49 @@ data class GrainParams(
     val layers: Float = 3.0f
 )
 
+/** Signal sent to the render coroutine whenever params or view mode change. */
+private data class RenderRequest(
+    val params: GrainParams,
+    val isLoupeMode: Boolean
+)
+
+@OptIn(FlowPreview::class)
 @Composable
 fun App() {
     MaterialTheme {
         var params by remember { mutableStateOf(GrainParams()) }
         var status by remember { mutableStateOf("Select an image to begin") }
+        var isLoading by remember { mutableStateOf(false) }
         var isProcessing by remember { mutableStateOf(false) }
-        var selectedFile by remember { mutableStateOf<File?>(null) }
+        var workspace by remember { mutableStateOf<ImageWorkspace?>(null) }
+        var isLoupeMode by remember { mutableStateOf(false) }
+        var previewBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+
+        val renderFlow = remember { MutableStateFlow(RenderRequest(GrainParams(), false)) }
+        val scope = rememberCoroutineScope()
+
+        // Push params 
+        LaunchedEffect(params, isLoupeMode) {
+            renderFlow.value = RenderRequest(params, isLoupeMode)
+        }
+
+        LaunchedEffect(workspace) {
+            val ws = workspace ?: return@LaunchedEffect
+            renderFlow.debounce(50).collectLatest { request ->
+                isProcessing = true
+                status = "Rendering preview…"
+                val bitmap = withContext(Dispatchers.Default) {
+                    renderPreview(ws, request.params, request.isLoupeMode)
+                }
+                previewBitmap = bitmap
+                isProcessing = false
+                status = if (request.isLoupeMode) "100% Loupe" else "Fit View"
+            }
+        }
 
         Row(modifier = Modifier.fillMaxSize()) {
 
+            // Left panel
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -76,63 +121,241 @@ fun App() {
                 Spacer(modifier = Modifier.height(20.dp))
             }
 
+            // Right panel
             Column(
                 modifier = Modifier
-                    .weight(0.5f)
+                    .weight(1f)
                     .fillMaxHeight()
                     .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(
-                    onClick = {
-                        val file = openFileDialog()
-                        if (file != null) {
-                            selectedFile = file
-                            status = "Selected: ${file.name}"
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(if (selectedFile == null) "Select Image" else "Change Image")
+                    Button(
+                        enabled = !isLoading,
+                        onClick = {
+                            val file = openFileDialog()
+                            if (file != null) {
+                                isLoading = true
+                                status = "Loading ${file.name}…"
+                                previewBitmap = null
+                                scope.launch(Dispatchers.Default) {
+                                    try {
+                                        val ws = ImageWorkspace.load(file)
+                                        workspace = ws
+                                        status = "Loaded – ${ws.originalWidth}×${ws.originalHeight}"
+                                    } catch (e: Exception) {
+                                        status = "Error: ${e.message}"
+                                        e.printStackTrace()
+                                    } finally {
+                                        isLoading = false
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(if (workspace == null) "Select Image" else "Change Image")
+                    }
+
+                    OutlinedButton(
+                        enabled = workspace != null,
+                        onClick = { isLoupeMode = !isLoupeMode },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(if (isLoupeMode) "View: 100%" else "View: Fit")
+                    }
                 }
 
                 Text(
-                    text = selectedFile?.path ?: "No file selected",
+                    text = status,
                     style = MaterialTheme.typography.caption,
-                    modifier = Modifier.padding(bottom = 20.dp)
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
-                Text(status, modifier = Modifier.padding(bottom = 20.dp))
+                if (isProcessing || isLoading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
+                }
+
+                val bmp = previewBitmap
+                if (bmp != null) {
+                    Image(
+                        bitmap = bmp,
+                        contentDescription = "Preview",
+                        contentScale = if (isLoupeMode) ContentScale.None else ContentScale.Fit,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No preview", style = MaterialTheme.typography.h6)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
-                    enabled = !isProcessing && selectedFile != null,
+                    enabled = workspace != null && !isProcessing,
                     onClick = {
+                        val ws = workspace ?: return@Button
                         isProcessing = true
-                        status = "Processing..."
-
-                        val fileToProcess = selectedFile!!
-
-                        Thread {
+                        status = "Exporting full resolution…"
+                        scope.launch(Dispatchers.Default) {
                             try {
-                                processImage(fileToProcess, params)
-                                status = "Done! Saved to output_compose.png"
+                                exportFullResolution(ws, params)
+                                status = "Saved to output_compose.png"
                             } catch (e: Exception) {
-                                status = "Error: ${e.message}"
+                                status = "Export error: ${e.message}"
                                 e.printStackTrace()
                             } finally {
                                 isProcessing = false
                             }
-                        }.start()
+                        }
                     },
                     modifier = Modifier.fillMaxWidth().height(50.dp)
                 ) {
-                    Text("Apply Grain")
+                    Text("Export Full Resolution")
                 }
             }
         }
     }
 }
+
+// ── Rendering helpers ──
+
+/**
+ * Render the proxy or loupe through Rust and return an ImageBitmap for Compose.
+ */
+fun renderPreview(workspace: ImageWorkspace, params: GrainParams, isLoupeMode: Boolean): ImageBitmap {
+    val (inputBuf, outputBuf, w, h) = if (isLoupeMode) {
+        PreviewBuffers(
+            workspace.loupeInputBuffer,
+            workspace.loupeOutputBuffer,
+            workspace.loupeWidth,
+            workspace.loupeHeight
+        )
+    } else {
+        PreviewBuffers(
+            workspace.proxyInputBuffer,
+            workspace.proxyOutputBuffer,
+            workspace.proxyWidth,
+            workspace.proxyHeight
+        )
+    }
+
+    // In proxy mode scale grain size so it looks proportional to the full image
+    val effectiveSize = if (isLoupeMode) {
+        params.size.toDouble()
+    } else {
+        params.size.toDouble() * workspace.proxyScaleFactor
+    }
+
+    inputBuf.rewind()
+
+    GrainProcessor.applyGrain(
+        inputBuf, outputBuf, w, h,
+        size = effectiveSize,
+        intensity = params.intensity.toDouble(),
+        crystalSharpness = params.sharpness.toDouble(),
+        saturation = params.saturation.toDouble(),
+        exposure = params.exposure.toDouble(),
+        shadowGrain = params.shadowGrain.toDouble(),
+        midtoneGrain = params.midtoneGrain.toDouble(),
+        highlightGrain = params.highlightGrain.toDouble(),
+        tonalSmoothness = params.tonalSmoothness.toDouble(),
+        depth = params.depth.toDouble(),
+        chromatic = params.chromatic.toDouble(),
+        relief = params.relief.toDouble(),
+        layers = params.layers.roundToInt()
+    )
+
+    return byteBufferToImageBitmap(outputBuf, w, h)
+}
+
+private data class PreviewBuffers(
+    val input: ByteBuffer,
+    val output: ByteBuffer,
+    val width: Int,
+    val height: Int,
+)
+
+/**
+ * Convert an RGB byte buffer into a Compose ImageBitmap 
+ */
+fun byteBufferToImageBitmap(buffer: ByteBuffer, width: Int, height: Int): ImageBitmap {
+    buffer.rewind()
+    val img = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            val r = buffer.get().toInt() and 0xFF
+            val g = buffer.get().toInt() and 0xFF
+            val b = buffer.get().toInt() and 0xFF
+            img.setRGB(x, y, (r shl 16) or (g shl 8) or b)
+        }
+    }
+    return img.toComposeImageBitmap()
+}
+
+/**
+ * Full-resolution export 
+ */
+fun exportFullResolution(workspace: ImageWorkspace, params: GrainParams) {
+    val width = workspace.originalWidth
+    val height = workspace.originalHeight
+    val byteSize = width * height * 3
+
+    val inputBuf = ByteBuffer.allocateDirect(byteSize)
+    val outputBuf = ByteBuffer.allocateDirect(byteSize)
+
+    val img = workspace.originalImage
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            val rgb = img.getRGB(x, y)
+            inputBuf.put(((rgb shr 16) and 0xFF).toByte())
+            inputBuf.put(((rgb shr 8) and 0xFF).toByte())
+            inputBuf.put((rgb and 0xFF).toByte())
+        }
+    }
+    inputBuf.rewind()
+
+    GrainProcessor.applyGrain(
+        inputBuf, outputBuf, width, height,
+        size = params.size.toDouble(),
+        intensity = params.intensity.toDouble(),
+        crystalSharpness = params.sharpness.toDouble(),
+        saturation = params.saturation.toDouble(),
+        exposure = params.exposure.toDouble(),
+        shadowGrain = params.shadowGrain.toDouble(),
+        midtoneGrain = params.midtoneGrain.toDouble(),
+        highlightGrain = params.highlightGrain.toDouble(),
+        tonalSmoothness = params.tonalSmoothness.toDouble(),
+        depth = params.depth.toDouble(),
+        chromatic = params.chromatic.toDouble(),
+        relief = params.relief.toDouble(),
+        layers = params.layers.roundToInt()
+    )
+
+    outputBuf.rewind()
+    val outputImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            val r = outputBuf.get().toInt() and 0xFF
+            val g = outputBuf.get().toInt() and 0xFF
+            val b = outputBuf.get().toInt() and 0xFF
+            val rgb = (r shl 16) or (g shl 8) or b
+            outputImage.setRGB(x, y, rgb)
+        }
+    }
+    ImageIO.write(outputImage, "png", File("output_compose.png"))
+}
+
+// ── UI components ──
 
 fun openFileDialog(): File? {
     val dialog = FileDialog(null as Frame?, "Select Image", FileDialog.LOAD)
@@ -180,54 +403,4 @@ fun SectionHeader(title: String) {
         modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
     )
     Divider()
-}
-
-fun processImage(inputFile: File, params: GrainParams) {
-    val inputImage = ImageIO.read(inputFile) ?: throw Exception("Could not read image")
-    val width = inputImage.width
-    val height = inputImage.height
-    val byteSize = width * height * 3
-
-    val inputBuf = ByteBuffer.allocateDirect(byteSize)
-    val outputBuf = ByteBuffer.allocateDirect(byteSize)
-
-    for (y in 0 until height) {
-        for (x in 0 until width) {
-            val rgb = inputImage.getRGB(x, y)
-            inputBuf.put(((rgb shr 16) and 0xFF).toByte())
-            inputBuf.put(((rgb shr 8) and 0xFF).toByte())
-            inputBuf.put((rgb and 0xFF).toByte())
-        }
-    }
-    inputBuf.rewind()
-
-    GrainProcessor.applyGrain(
-        inputBuf, outputBuf, width, height,
-        size = params.size.toDouble(),
-        intensity = params.intensity.toDouble(),
-        crystalSharpness = params.sharpness.toDouble(),
-        saturation = params.saturation.toDouble(),
-        exposure = params.exposure.toDouble(),
-        shadowGrain = params.shadowGrain.toDouble(),
-        midtoneGrain = params.midtoneGrain.toDouble(),
-        highlightGrain = params.highlightGrain.toDouble(),
-        tonalSmoothness = params.tonalSmoothness.toDouble(),
-        depth = params.depth.toDouble(),
-        chromatic = params.chromatic.toDouble(),
-        relief = params.relief.toDouble(),
-        layers = params.layers.roundToInt()
-    )
-
-    outputBuf.rewind()
-    val outputImage = java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_RGB)
-    for (y in 0 until height) {
-        for (x in 0 until width) {
-            val r = outputBuf.get().toInt() and 0xFF
-            val g = outputBuf.get().toInt() and 0xFF
-            val b = outputBuf.get().toInt() and 0xFF
-            val rgb = (r shl 16) or (g shl 8) or b
-            outputImage.setRGB(x, y, rgb)
-        }
-    }
-    ImageIO.write(outputImage, "png", File("output_compose.png"))
 }

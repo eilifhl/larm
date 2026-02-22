@@ -42,6 +42,10 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
 
-        jvmArgs += listOf("-Djava.library.path=${project.rootDir.resolve("libs").absolutePath}")
+        jvmArgs += listOf(
+            "-Djava.library.path=${project.rootDir.resolve("libs").absolutePath}",
+            "-Dsun.java2d.uiScale.enabled=true",
+            "-Dsun.java2d.uiScale=1.0"
+        )
     }
 }
