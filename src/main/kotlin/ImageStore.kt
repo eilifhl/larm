@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
  * In production, you might want to use disk storage or a cache with TTL.
  */
 object ImageStore {
-    private const val MAX_PROXY_WIDTH = 800
+    private const val MAX_PROXY_WIDTH = 1200
 
     data class ImageSession(
         val id: String,

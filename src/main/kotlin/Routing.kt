@@ -80,7 +80,8 @@ fun Application.configureRouting() {
 
         /**
          * POST /preview/{sessionId}
-         * Apply grain effect to the proxy image with the given parameters.
+         * Apply grain effect to the proxy or loupe image with the given parameters.
+         * Query params: mode=proxy|loupe, x=0.0-1.0, y=0.0-1.0
          * Request body: JSON GrainParams
          * Response: JPEG image bytes
          */
@@ -93,11 +94,35 @@ fun Application.configureRouting() {
 
             try {
                 val params = call.receive<GrainParams>()
+                val mode = call.request.queryParameters["mode"] ?: "proxy"
 
-                val processed = ImageProcessingService.applyGrain(session.proxyImage, params)
-                val jpegBytes = ImageStore.toJpegBytes(processed)
+                if (mode == "loupe") {
+                    val x = (call.request.queryParameters["x"] ?: "0.5").toDouble().coerceIn(0.0, 1.0)
+                    val y = (call.request.queryParameters["y"] ?: "0.5").toDouble().coerceIn(0.0, 1.0)
 
-                call.respondBytes(jpegBytes, ContentType.Image.JPEG)
+                    val fullImage = session.fullImage
+                    val cropSize = 800
+                    val startX = ((fullImage.width * x) - cropSize / 2).toInt().coerceIn(0, (fullImage.width - cropSize).coerceAtLeast(0))
+                    val startY = ((fullImage.height * y) - cropSize / 2).toInt().coerceIn(0, (fullImage.height - cropSize).coerceAtLeast(0))
+                    val actualW = minOf(cropSize, fullImage.width - startX)
+                    val actualH = minOf(cropSize, fullImage.height - startY)
+
+                    val crop = fullImage.getSubimage(startX, startY, actualW, actualH)
+                    // Use exact params — no scaling for loupe (1:1 pixel view)
+                    val processed = ImageProcessingService.applyGrain(crop, params)
+                    val jpegBytes = ImageStore.toJpegBytes(processed)
+
+                    call.respondBytes(jpegBytes, ContentType.Image.JPEG)
+                } else {
+                    // Proxy mode: scale grain size proportionally
+                    val scale = session.proxyImage.width.toDouble() / session.fullImage.width.toDouble()
+                    val scaledParams = params.copy(size = params.size * scale)
+
+                    val processed = ImageProcessingService.applyGrain(session.proxyImage, scaledParams)
+                    val jpegBytes = ImageStore.toJpegBytes(processed)
+
+                    call.respondBytes(jpegBytes, ContentType.Image.JPEG)
+                }
             } catch (e: Exception) {
                 logger.error("Preview failed", e)
                 call.respond(HttpStatusCode.InternalServerError, "Preview failed: ${e.message}")

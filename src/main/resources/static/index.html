@@ -210,6 +210,41 @@
             color: #666;
             margin-bottom: 15px;
         }
+
+        .view-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .view-btn {
+            background: #333;
+            color: #888;
+            border: 1px solid #444;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: #4a9eff;
+            color: white;
+            border-color: #4a9eff;
+        }
+
+        .view-hint {
+            font-size: 12px;
+            color: #666;
+            margin-left: 10px;
+        }
+
+        #preview {
+            cursor: crosshair;
+        }
     </style>
 </head>
 <body>
@@ -339,6 +374,13 @@
         </div>
 
         <div class="main">
+            <!-- View mode controls -->
+            <div class="view-controls" id="viewControls" style="display: none;">
+                <button class="view-btn active" id="btnProxy">Fit (Proxy)</button>
+                <button class="view-btn" id="btnLoupe">100% (Loupe)</button>
+                <span class="view-hint" id="viewHint">Click image to inspect 100% details</span>
+            </div>
+
             <div class="preview-container">
                 <img id="preview" alt="Preview">
                 <div class="placeholder" id="placeholder">
@@ -354,6 +396,9 @@
     <script>
         let sessionId = null;
         let previewTimeout = null;
+        let viewMode = 'proxy'; // 'proxy' or 'loupe'
+        let loupeX = 0.5;
+        let loupeY = 0.5;
 
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -362,6 +407,10 @@
         const controls = document.getElementById('controls');
         const exportBtn = document.getElementById('exportBtn');
         const status = document.getElementById('status');
+        const btnProxy = document.getElementById('btnProxy');
+        const btnLoupe = document.getElementById('btnLoupe');
+        const viewControls = document.getElementById('viewControls');
+        const viewHint = document.getElementById('viewHint');
 
         // Slider IDs and their value display elements
         const sliders = [
@@ -369,6 +418,38 @@
             'shadowGrain', 'midtoneGrain', 'highlightGrain', 'tonalSmoothness',
             'saturation', 'exposure', 'depth', 'chromatic', 'relief'
         ];
+
+        // View mode toggle logic
+        function setViewMode(mode) {
+            viewMode = mode;
+            if (mode === 'proxy') {
+                btnProxy.classList.add('active');
+                btnLoupe.classList.remove('active');
+                viewHint.textContent = 'Click image to inspect 100% details';
+                preview.style.cursor = 'crosshair';
+            } else {
+                btnLoupe.classList.add('active');
+                btnProxy.classList.remove('active');
+                viewHint.textContent = 'Click to return to Fit view';
+                preview.style.cursor = 'zoom-out';
+            }
+            updatePreview();
+        }
+
+        btnProxy.addEventListener('click', () => setViewMode('proxy'));
+        btnLoupe.addEventListener('click', () => setViewMode('loupe'));
+
+        // Click on image to toggle loupe
+        preview.addEventListener('click', (e) => {
+            if (viewMode === 'proxy') {
+                const rect = preview.getBoundingClientRect();
+                loupeX = (e.clientX - rect.left) / rect.width;
+                loupeY = (e.clientY - rect.top) / rect.height;
+                setViewMode('loupe');
+            } else {
+                setViewMode('proxy');
+            }
+        });
 
         // Upload handlers
         uploadArea.addEventListener('click', () => fileInput.click());
@@ -422,6 +503,7 @@
 
                 // Show controls and load initial preview
                 controls.style.display = 'block';
+                viewControls.style.display = 'flex';
                 placeholder.style.display = 'none';
                 preview.style.display = 'block';
 
@@ -470,7 +552,8 @@
             };
 
             try {
-                const response = await fetch(`/preview/${sessionId}`, {
+                const url = `/preview/${sessionId}?mode=${viewMode}&x=${loupeX}&y=${loupeY}`;
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(params)
@@ -479,15 +562,15 @@
                 if (!response.ok) throw new Error('Preview failed');
 
                 const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
+                const url2 = URL.createObjectURL(blob);
 
                 // Revoke old URL to prevent memory leaks
                 if (preview.src.startsWith('blob:')) {
                     URL.revokeObjectURL(preview.src);
                 }
 
-                preview.src = url;
-                status.textContent = 'Preview updated';
+                preview.src = url2;
+                status.textContent = viewMode === 'proxy' ? 'Preview updated' : 'Loupe updated';
             } catch (e) {
                 status.textContent = 'Preview error: ' + e.message;
                 console.error(e);
