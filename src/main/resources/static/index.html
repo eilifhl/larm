@@ -4,7 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Larm - Film Grain Generator</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --bg-main: #ffffff;
+        --bg-panel: #f4f4f4;
+        --text-main: #161616;
+        --text-secondary: #525252;
+        --border-color: #e0e0e0;
+        --border-strong: #8d8d8d;
+        --accent-blue: #0f62fe;
+        --accent-hover: #0353e9;
+        --focus-ring: #0f62fe;
+      }
+
       * {
         box-sizing: border-box;
         margin: 0;
@@ -13,10 +29,16 @@
 
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: #1a1a1a;
-        color: #e0e0e0;
+          "IBM Plex Sans",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        background: var(--bg-main);
+        color: var(--text-main);
         min-height: 100vh;
+        line-height: 1.5;
       }
 
       .container {
@@ -25,11 +47,11 @@
       }
 
       .sidebar {
-        width: 320px;
-        background: #252525;
-        padding: 20px;
+        width: 340px;
+        background: var(--bg-panel);
+        padding: 24px;
         overflow-y: auto;
-        border-right: 1px solid #333;
+        border-right: 1px solid var(--border-color);
       }
 
       .main {
@@ -38,41 +60,49 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 20px;
-        background: #1a1a1a;
+        padding: 32px;
+        background: var(--bg-main);
       }
 
       h1 {
-        font-size: 24px;
-        margin-bottom: 20px;
-        color: #fff;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 24px;
+        color: var(--text-main);
+        letter-spacing: -0.5px;
       }
 
       h2 {
         font-size: 14px;
-        color: #888;
-        margin: 20px 0 10px 0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin: 32px 0 16px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border-color);
       }
 
       .upload-area {
-        border: 2px dashed #444;
-        border-radius: 8px;
-        padding: 40px;
+        border: 2px dashed var(--border-strong);
+        background: var(--bg-main);
+        padding: 32px 20px;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
         cursor: pointer;
-        transition: border-color 0.2s;
+        transition: all 0.2s ease;
+      }
+
+      .upload-area p {
+        font-size: 14px;
+        color: var(--text-secondary);
       }
 
       .upload-area:hover {
-        border-color: #666;
+        border-color: var(--accent-blue);
       }
 
       .upload-area.dragover {
-        border-color: #4a9eff;
-        background: rgba(74, 158, 255, 0.1);
+        border-color: var(--accent-blue);
+        background: #e5f0ff;
       }
 
       .upload-area input {
@@ -80,43 +110,48 @@
       }
 
       .slider-group {
-        margin-bottom: 15px;
+        margin-bottom: 20px;
       }
 
       .slider-label {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 5px;
-        font-size: 13px;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: var(--text-secondary);
       }
 
       .slider-value {
-        color: #4a9eff;
-        font-weight: 500;
+        color: var(--accent-blue);
+        font-weight: 600;
         cursor: pointer;
-        min-width: 36px;
+        min-width: 40px;
         text-align: right;
       }
 
       .slider-value-input {
         width: 50px;
-        background: #1a1a1a;
-        border: 1px solid #4a9eff;
-        border-radius: 3px;
-        color: #4a9eff;
-        font-size: 13px;
-        font-weight: 500;
+        background: var(--bg-main);
+        border: 1px solid var(--accent-blue);
+        color: var(--text-main);
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
         text-align: right;
-        padding: 1px 4px;
-        outline: none;
+        padding: 2px 4px;
+        outline: 2px solid transparent;
+      }
+
+      .slider-value-input:focus {
+        outline: 2px solid var(--accent-blue);
+        outline-offset: 1px;
       }
 
       input[type="range"] {
         width: 100%;
-        height: 6px;
+        height: 4px;
         -webkit-appearance: none;
-        background: #333;
-        border-radius: 3px;
+        background: var(--border-color);
         outline: none;
       }
 
@@ -124,141 +159,137 @@
         -webkit-appearance: none;
         width: 16px;
         height: 16px;
-        background: #4a9eff;
-        border-radius: 50%;
+        background: var(--accent-blue);
+        border-radius: 50%
         cursor: pointer;
+        border: 2px solid var(--bg-panel);
       }
 
       input[type="range"]::-moz-range-thumb {
-        width: 16px;
-        height: 16px;
-        background: #4a9eff;
+        width: 12px;
+        height: 12px;
+        background: var(--accent-blue);
         border-radius: 50%;
         cursor: pointer;
-        border: none;
+        border: 2px solid var(--bg-panel);
+      }
+
+      input[type="range"]:focus::-webkit-slider-thumb {
+        box-shadow:
+          0 0 0 2px var(--bg-panel),
+          0 0 0 4px var(--accent-blue);
       }
 
       .preview-container {
         max-width: 100%;
-        max-height: calc(100vh - 120px);
+        max-height: calc(100vh - 140px);
         display: flex;
         align-items: center;
         justify-content: center;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-color);
+        padding: 1px;
       }
 
       #preview {
         max-width: 100%;
-        max-height: calc(100vh - 120px);
-        border-radius: 4px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        max-height: calc(100vh - 142px);
         display: none;
       }
 
       .placeholder {
         text-align: center;
-        color: #666;
+        color: var(--text-secondary);
+        padding: 40px;
       }
 
       .placeholder svg {
-        width: 100px;
-        height: 100px;
-        margin-bottom: 20px;
-        fill: #333;
+        width: 64px;
+        height: 64px;
+        margin-bottom: 16px;
+        fill: var(--border-strong);
       }
 
       .btn {
         width: 100%;
-        padding: 12px;
+        padding: 14px 16px;
         border: none;
-        border-radius: 6px;
+        font-family: inherit;
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
-        transition: background 0.2s;
-        margin-top: 10px;
+        margin-top: 16px;
+        transition: background 0.15s;
       }
 
       .btn-primary {
-        background: #4a9eff;
+        background: var(--accent-blue);
         color: white;
       }
 
       .btn-primary:hover {
-        background: #3a8eef;
+        background: var(--accent-hover);
+      }
+
+      .btn-primary:focus {
+        outline: 2px solid var(--focus-ring);
+        outline-offset: 2px;
       }
 
       .btn-primary:disabled {
-        background: #333;
-        color: #666;
+        background: var(--border-color);
+        color: var(--border-strong);
         cursor: not-allowed;
       }
 
       .status {
-        font-size: 12px;
-        color: #666;
-        margin-top: 10px;
-        text-align: center;
-      }
-
-      .loading {
-        position: relative;
-      }
-
-      .loading::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 20px;
-        height: 20px;
-        margin: -10px 0 0 -10px;
-        border: 2px solid transparent;
-        border-top-color: #4a9eff;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-
-      .info-text {
-        font-size: 11px;
-        color: #666;
-        margin-bottom: 15px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-top: 16px;
+        text-align: left;
+        border-left: 2px solid var(--accent-blue);
+        padding-left: 12px;
+        min-height: 20px;
       }
 
       .view-controls {
         display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
+        margin-bottom: 24px;
         justify-content: center;
         align-items: center;
       }
 
       .view-btn {
-        background: #333;
-        color: #888;
-        border: 1px solid #444;
-        padding: 6px 16px;
-        border-radius: 20px;
+        background: var(--bg-main);
+        color: var(--accent-blue);
+        border: 1px solid var(--accent-blue);
+        padding: 8px 24px;
         cursor: pointer;
-        font-size: 13px;
-        transition: all 0.2s;
+        font-size: 14px;
+        font-family: inherit;
+        font-weight: 500;
+        transition: all 0.15s;
+      }
+
+      .view-btn:first-child {
+        border-right: none;
       }
 
       .view-btn.active {
-        background: #4a9eff;
+        background: var(--accent-blue);
         color: white;
-        border-color: #4a9eff;
+      }
+
+      .view-btn:focus {
+        outline: 2px solid var(--focus-ring);
+        outline-offset: 2px;
+        z-index: 1;
       }
 
       .view-hint {
-        font-size: 12px;
-        color: #666;
-        margin-left: 10px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-left: 16px;
       }
 
       #preview {
@@ -269,15 +300,15 @@
   <body>
     <div class="container">
       <div class="sidebar">
-        <h1>Larm</h1>
+        <h1>larm</h1>
 
         <div class="upload-area" id="uploadArea">
           <input type="file" id="fileInput" accept="image/*" />
-          <p>Drop an image here or click to upload</p>
+          <p>Drop image file here or click to browse</p>
         </div>
 
         <div id="controls" style="display: none">
-          <h2>Grain</h2>
+          <h2>Grain Parameters</h2>
 
           <div class="slider-group">
             <div class="slider-label">
@@ -287,9 +318,9 @@
             <input
               type="range"
               id="size"
-              min="0.5"
+              min="0.1"
               max="10"
-              step="1"
+              step="0.1"
               value="2.5"
             />
           </div>
@@ -297,37 +328,37 @@
           <div class="slider-group">
             <div class="slider-label">
               <span>Intensity</span>
-              <span class="slider-value" id="intensityValue">0.5</span>
+              <span class="slider-value" id="intensityValue">0.8</span>
             </div>
             <input
               type="range"
               id="intensity"
               min="0"
-              max="10"
-              step="1"
-              value="0.5"
+              max="2"
+              step="0.01"
+              value="0.8"
             />
           </div>
 
           <div class="slider-group">
             <div class="slider-label">
               <span>Crystal Sharpness</span>
-              <span class="slider-value" id="crystalSharpnessValue">0.5</span>
+              <span class="slider-value" id="crystalSharpnessValue">8.0</span>
             </div>
             <input
               type="range"
               id="crystalSharpness"
               min="0"
-              max="1"
-              step="0.01"
-              value="0.5"
+              max="20"
+              step="0.1"
+              value="8.0"
             />
           </div>
 
           <div class="slider-group">
             <div class="slider-label">
               <span>Layers</span>
-              <span class="slider-value" id="layersValue">1</span>
+              <span class="slider-value" id="layersValue">3</span>
             </div>
             <input
               type="range"
@@ -335,16 +366,16 @@
               min="1"
               max="5"
               step="1"
-              value="1"
+              value="3"
             />
           </div>
 
-          <h2>Tonal Control</h2>
+          <h2>Tonal Distribution</h2>
 
           <div class="slider-group">
             <div class="slider-label">
               <span>Shadow Grain</span>
-              <span class="slider-value" id="shadowGrainValue">1.0</span>
+              <span class="slider-value" id="shadowGrainValue">1.2</span>
             </div>
             <input
               type="range"
@@ -352,7 +383,7 @@
               min="0"
               max="2"
               step="0.01"
-              value="1"
+              value="1.2"
             />
           </div>
 
@@ -367,14 +398,14 @@
               min="0"
               max="2"
               step="0.01"
-              value="1"
+              value="1.0"
             />
           </div>
 
           <div class="slider-group">
             <div class="slider-label">
               <span>Highlight Grain</span>
-              <span class="slider-value" id="highlightGrainValue">1.0</span>
+              <span class="slider-value" id="highlightGrainValue">0.6</span>
             </div>
             <input
               type="range"
@@ -382,26 +413,26 @@
               min="0"
               max="2"
               step="0.01"
-              value="1"
+              value="0.6"
             />
           </div>
 
           <div class="slider-group">
             <div class="slider-label">
               <span>Tonal Smoothness</span>
-              <span class="slider-value" id="tonalSmoothnessValue">0.5</span>
+              <span class="slider-value" id="tonalSmoothnessValue">0.15</span>
             </div>
             <input
               type="range"
               id="tonalSmoothness"
-              min="0"
+              min="0.01"
               max="1"
               step="0.01"
-              value="0.5"
+              value="0.15"
             />
           </div>
 
-          <h2>Color & Depth</h2>
+          <h2>Physical Emulsion</h2>
 
           <div class="slider-group">
             <div class="slider-label">
@@ -414,7 +445,7 @@
               min="0"
               max="2"
               step="0.01"
-              value="1"
+              value="1.0"
             />
           </div>
 
@@ -426,17 +457,17 @@
             <input
               type="range"
               id="exposure"
-              min="-1"
-              max="1"
+              min="-2"
+              max="2"
               step="0.01"
-              value="0"
+              value="0.0"
             />
           </div>
 
           <div class="slider-group">
             <div class="slider-label">
               <span>Depth</span>
-              <span class="slider-value" id="depthValue">0.5</span>
+              <span class="slider-value" id="depthValue">0.4</span>
             </div>
             <input
               type="range"
@@ -444,29 +475,29 @@
               min="0"
               max="1"
               step="0.01"
-              value="0.5"
+              value="0.4"
             />
           </div>
 
           <div class="slider-group">
             <div class="slider-label">
               <span>Chromatic</span>
-              <span class="slider-value" id="chromaticValue">0.0</span>
+              <span class="slider-value" id="chromaticValue">2.0</span>
             </div>
             <input
               type="range"
               id="chromatic"
               min="0"
-              max="10"
-              step="1"
-              value="0"
+              max="5"
+              step="0.1"
+              value="2.0"
             />
           </div>
 
           <div class="slider-group">
             <div class="slider-label">
               <span>Relief</span>
-              <span class="slider-value" id="reliefValue">0.0</span>
+              <span class="slider-value" id="reliefValue">0.3</span>
             </div>
             <input
               type="range"
@@ -474,22 +505,22 @@
               min="0"
               max="1"
               step="0.01"
-              value="0"
+              value="0.3"
             />
           </div>
 
-          <button class="btn btn-primary" id="exportBtn">
-            Export Full Resolution
-          </button>
-          <div class="status" id="status"></div>
+          <button class="btn btn-primary" id="exportBtn">Export render</button>
+          <div class="status" id="status">Awaiting upload.</div>
         </div>
       </div>
 
       <div class="main">
         <!-- View mode controls -->
         <div class="view-controls" id="viewControls" style="display: none">
-          <button class="view-btn active" id="btnProxy">Fit (Proxy)</button>
-          <button class="view-btn" id="btnLoupe">100% (Loupe)</button>
+          <div>
+            <button class="view-btn active" id="btnProxy">Fit (Proxy)</button>
+            <button class="view-btn" id="btnLoupe">100% (Loupe)</button>
+          </div>
           <span class="view-hint" id="viewHint"
             >Click image to inspect 100% details</span
           >
@@ -503,7 +534,7 @@
                 d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
               />
             </svg>
-            <p>Upload an image to get started</p>
+            <p>Upload an image to start processing</p>
           </div>
         </div>
       </div>
@@ -512,7 +543,7 @@
     <script>
       let sessionId = null;
       let previewTimeout = null;
-      let viewMode = "proxy"; // 'proxy' or 'loupe'
+      let viewMode = "proxy";
       let loupeX = 0.5;
       let loupeY = 0.5;
 
@@ -528,7 +559,6 @@
       const viewControls = document.getElementById("viewControls");
       const viewHint = document.getElementById("viewHint");
 
-      // Slider IDs and their value display elements
       const sliders = [
         "size",
         "intensity",
@@ -545,7 +575,6 @@
         "relief",
       ];
 
-      // View mode toggle logic
       function setViewMode(mode) {
         viewMode = mode;
         if (mode === "proxy") {
@@ -565,7 +594,6 @@
       btnProxy.addEventListener("click", () => setViewMode("proxy"));
       btnLoupe.addEventListener("click", () => setViewMode("loupe"));
 
-      // Click on image to toggle loupe
       preview.addEventListener("click", (e) => {
         if (viewMode === "proxy") {
           const rect = preview.getBoundingClientRect();
@@ -577,7 +605,6 @@
         }
       });
 
-      // Upload handlers
       uploadArea.addEventListener("click", () => fileInput.click());
 
       uploadArea.addEventListener("dragover", (e) => {
@@ -609,7 +636,7 @@
           return;
         }
 
-        status.textContent = "Uploading...";
+        status.textContent = "Uploading to engine...";
 
         const formData = new FormData();
         formData.append("file", file);
@@ -625,16 +652,17 @@
           const data = await response.json();
           sessionId = data.sessionId;
 
-          status.textContent = `Uploaded: ${data.width}×${data.height} (preview: ${data.proxyWidth}×${data.proxyHeight})`;
+          status.textContent = `Ready. Target: ${data.width}×${data.height}`;
 
           controls.style.display = "block";
           viewControls.style.display = "flex";
           placeholder.style.display = "none";
           preview.style.display = "block";
+          uploadArea.style.display = "none";
 
           preview.src = `/proxy/${sessionId}?t=${Date.now()}`;
         } catch (e) {
-          status.textContent = "Upload failed: " + e.message;
+          status.textContent = "System error: " + e.message;
           console.error(e);
         }
       }
@@ -687,6 +715,7 @@
 
       function debouncePreview() {
         if (previewTimeout) clearTimeout(previewTimeout);
+        status.textContent = "Rendering...";
         previewTimeout = setTimeout(updatePreview, 50);
       }
 
@@ -729,16 +758,14 @@
           const blob = await response.blob();
           const url2 = URL.createObjectURL(blob);
 
-          // Revoke old URL to prevent memory leaks
           if (preview.src.startsWith("blob:")) {
             URL.revokeObjectURL(preview.src);
           }
 
           preview.src = url2;
-          status.textContent =
-            viewMode === "proxy" ? "Preview updated" : "Loupe updated";
+          status.textContent = "Render complete.";
         } catch (e) {
-          status.textContent = "Preview error: " + e.message;
+          status.textContent = "Render failed: " + e.message;
           console.error(e);
         }
       }
@@ -747,7 +774,7 @@
         if (!sessionId) return;
 
         exportBtn.disabled = true;
-        status.textContent = "Exporting full resolution...";
+        status.textContent = "Processing full resolution...";
 
         const params = {
           size: getVal("size"),
@@ -777,18 +804,17 @@
           const blob = await response.blob();
           const url = URL.createObjectURL(blob);
 
-          // Trigger download
           const a = document.createElement("a");
           a.href = url;
-          a.download = "grain_export.png";
+          a.download = "larm_export.png";
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
 
-          status.textContent = "Export complete!";
+          status.textContent = "Export complete.";
         } catch (e) {
-          status.textContent = "Export error: " + e.message;
+          status.textContent = "System error: " + e.message;
           console.error(e);
         } finally {
           exportBtn.disabled = false;
