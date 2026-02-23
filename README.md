@@ -1,6 +1,8 @@
 # larm
 larm is a film grain/noise generator written in Rust and Kotlin.
 
+<img width="2706" height="1548" alt="image" src="https://github.com/user-attachments/assets/a198a67b-b0ea-4177-8ed5-3ac65953f538" />
+
 # Building from source
 larm is not currently packaged for any package managers.
 
