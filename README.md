@@ -14,7 +14,6 @@ make
 The Web UI will then be available at port 8080.
 
 # Examples
->>>>>>> origin/dev
 ![extreme_max_grain.png](./examples/extreme_max_grain.png)
 
 ### Cropped
