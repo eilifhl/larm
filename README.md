@@ -1,41 +1,29 @@
 # larm
+larm is a film grain/noise generator written in Rust and Kotlin.
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+# Building from source
+larm is not currently packaged for any package managers.
 
-Here are some useful links to get you started:
+It can be built from source with make:
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
-
-## Features
-
-Here's a list of features included in this project:
-
-| Name                                                               | Description                                                                        |
-| --------------------------------------------------------------------|------------------------------------------------------------------------------------ |
-| [Routing](https://start.ktor.io/p/routing)                         | Provides a structured routing DSL                                                  |
-| [WebSockets](https://start.ktor.io/p/ktor-websockets)              | Adds WebSocket protocol support for bidirectional client connections               |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation) | Provides automatic content conversion according to Content-Type and Accept headers |
-
-## Building & Running
-
-To build or run the project, use one of the following tasks:
-
-| Task                                    | Description                                                          |
-| -----------------------------------------|---------------------------------------------------------------------- |
-| `./gradlew test`                        | Run the tests                                                        |
-| `./gradlew build`                       | Build everything                                                     |
-| `./gradlew buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `./gradlew buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `./gradlew publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `./gradlew run`                         | Run the server                                                       |
-| `./gradlew runDocker`                   | Run using the local docker image                                     |
-
-If the server starts successfully, you'll see the following output:
-
+``` bash
+git clone git@github.com:eilifhl/larm.git
+cd larm
+make
 ```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
-```
+
+# Examples
+![extreme_max_grain.png](./examples/extreme_max_grain.png)
+
+### Cropped
+![extreme_max_grain_crop.png](./examples/extreme_max_grain_crop.png)
+
+--- 
+
+![artistic_grungy.png](./examples/artistic_grungy.png)
+
+### Cropped
+![artistic_grungy_crop.png](./examples/artistic_grungy_crop.png)
+
+
 
