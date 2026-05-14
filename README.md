@@ -1,19 +1,39 @@
 # larm
-larm is a film grain/noise generator written in Rust and Kotlin.
+larm is a film grain/noise generator written in Rust and delivered as a browser-only WebAssembly app.
 
 <img width="2706" height="1548" alt="image" src="https://github.com/user-attachments/assets/a198a67b-b0ea-4177-8ed5-3ac65953f538" />
 
 # Building from source
-larm is not currently packaged for any package managers.
+larm is now a browser-only app. The grain engine is compiled from Rust to WebAssembly and the UI is served as static files.
 
-It can be built from source with make:
+Requirements:
 
-``` bash
+- Rust with the `wasm32-unknown-unknown` target available
+- Node.js
+- Python 3 for the local static file server
+
+If you use `rustup`, install the target with:
+
+```bash
+rustup target add wasm32-unknown-unknown
+```
+
+Build and run:
+
+```bash
 git clone git@github.com:eilifhl/larm.git
 cd larm
-make
+npm run build
+npm run dev
 ```
-The Web UI will then be available at port 8080.
+
+The UI will then be available at `http://localhost:8080`.
+
+You can also use:
+
+```bash
+make run
+```
 
 # Examples
 ![extreme_max_grain.png](./examples/extreme_max_grain.png)

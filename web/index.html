@@ -160,7 +160,7 @@
         width: 16px;
         height: 16px;
         background: var(--accent-blue);
-        border-radius: 50%
+        border-radius: 50%;
         cursor: pointer;
         border: 2px solid var(--bg-panel);
       }
@@ -181,6 +181,7 @@
       }
 
       .preview-container {
+        position: relative;
         max-width: 100%;
         max-height: calc(100vh - 140px);
         display: flex;
@@ -195,12 +196,32 @@
         max-width: 100%;
         max-height: calc(100vh - 142px);
         display: none;
+        cursor: crosshair;
       }
 
       .placeholder {
         text-align: center;
         color: var(--text-secondary);
         padding: 40px;
+      }
+
+      .loading-overlay {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(244, 244, 244, 0.88);
+        color: var(--text-main);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        text-align: center;
+      }
+
+      .loading-overlay.visible {
+        display: flex;
       }
 
       .placeholder svg {
@@ -292,8 +313,31 @@
         margin-left: 16px;
       }
 
-      #preview {
-        cursor: crosshair;
+      @media (max-width: 960px) {
+        .container {
+          flex-direction: column;
+          height: auto;
+          min-height: 100vh;
+        }
+
+        .sidebar {
+          width: 100%;
+          border-right: none;
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .main {
+          padding: 24px;
+        }
+
+        .view-controls {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .view-hint {
+          margin-left: 0;
+        }
       }
     </style>
   </head>
@@ -305,6 +349,9 @@
         <div class="upload-area" id="uploadArea">
           <input type="file" id="fileInput" accept="image/*" />
           <p>Drop image file here or click to browse</p>
+          <p id="uploadMessage" style="margin-top: 10px; font-size: 12px">
+            Browser engine loading...
+          </p>
         </div>
 
         <div id="controls" style="display: none">
@@ -312,17 +359,25 @@
 
           <div class="slider-group">
             <div class="slider-label">
-              <span>Size</span>
-              <span class="slider-value" id="sizeValue">2.5</span>
+              <span>Preview Quality</span>
+              <span class="slider-value" id="previewQualityValue">0.65</span>
             </div>
             <input
               type="range"
-              id="size"
-              min="0.1"
-              max="10"
-              step="0.1"
-              value="2.5"
+              id="previewQuality"
+              min="0.25"
+              max="1"
+              step="0.05"
+              value="0.65"
             />
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Size</span>
+              <span class="slider-value" id="sizeValue">2.5</span>
+            </div>
+            <input type="range" id="size" min="0.1" max="10" step="0.1" value="2.5" />
           </div>
 
           <div class="slider-group">
@@ -330,14 +385,7 @@
               <span>Intensity</span>
               <span class="slider-value" id="intensityValue">0.8</span>
             </div>
-            <input
-              type="range"
-              id="intensity"
-              min="0"
-              max="2"
-              step="0.01"
-              value="0.8"
-            />
+            <input type="range" id="intensity" min="0" max="2" step="0.01" value="0.8" />
           </div>
 
           <div class="slider-group">
@@ -360,14 +408,7 @@
               <span>Layers</span>
               <span class="slider-value" id="layersValue">3</span>
             </div>
-            <input
-              type="range"
-              id="layers"
-              min="1"
-              max="5"
-              step="1"
-              value="3"
-            />
+            <input type="range" id="layers" min="1" max="5" step="1" value="3" />
           </div>
 
           <h2>Tonal Distribution</h2>
@@ -377,14 +418,7 @@
               <span>Shadow Grain</span>
               <span class="slider-value" id="shadowGrainValue">1.2</span>
             </div>
-            <input
-              type="range"
-              id="shadowGrain"
-              min="0"
-              max="2"
-              step="0.01"
-              value="1.2"
-            />
+            <input type="range" id="shadowGrain" min="0" max="2" step="0.01" value="1.2" />
           </div>
 
           <div class="slider-group">
@@ -392,14 +426,7 @@
               <span>Midtone Grain</span>
               <span class="slider-value" id="midtoneGrainValue">1.0</span>
             </div>
-            <input
-              type="range"
-              id="midtoneGrain"
-              min="0"
-              max="2"
-              step="0.01"
-              value="1.0"
-            />
+            <input type="range" id="midtoneGrain" min="0" max="2" step="0.01" value="1.0" />
           </div>
 
           <div class="slider-group">
@@ -439,14 +466,7 @@
               <span>Saturation</span>
               <span class="slider-value" id="saturationValue">1.0</span>
             </div>
-            <input
-              type="range"
-              id="saturation"
-              min="0"
-              max="2"
-              step="0.01"
-              value="1.0"
-            />
+            <input type="range" id="saturation" min="0" max="2" step="0.01" value="1.0" />
           </div>
 
           <div class="slider-group">
@@ -454,14 +474,7 @@
               <span>Exposure</span>
               <span class="slider-value" id="exposureValue">0.0</span>
             </div>
-            <input
-              type="range"
-              id="exposure"
-              min="-2"
-              max="2"
-              step="0.01"
-              value="0.0"
-            />
+            <input type="range" id="exposure" min="-2" max="2" step="0.01" value="0.0" />
           </div>
 
           <div class="slider-group">
@@ -469,14 +482,7 @@
               <span>Depth</span>
               <span class="slider-value" id="depthValue">0.4</span>
             </div>
-            <input
-              type="range"
-              id="depth"
-              min="0"
-              max="1"
-              step="0.01"
-              value="0.4"
-            />
+            <input type="range" id="depth" min="0" max="1" step="0.01" value="0.4" />
           </div>
 
           <div class="slider-group">
@@ -484,14 +490,7 @@
               <span>Chromatic</span>
               <span class="slider-value" id="chromaticValue">2.0</span>
             </div>
-            <input
-              type="range"
-              id="chromatic"
-              min="0"
-              max="5"
-              step="0.1"
-              value="2.0"
-            />
+            <input type="range" id="chromatic" min="0" max="5" step="0.1" value="2.0" />
           </div>
 
           <div class="slider-group">
@@ -499,35 +498,25 @@
               <span>Relief</span>
               <span class="slider-value" id="reliefValue">0.3</span>
             </div>
-            <input
-              type="range"
-              id="relief"
-              min="0"
-              max="1"
-              step="0.01"
-              value="0.3"
-            />
+            <input type="range" id="relief" min="0" max="1" step="0.01" value="0.3" />
           </div>
 
           <button class="btn btn-primary" id="exportBtn">Export render</button>
-          <div class="status" id="status">Awaiting upload.</div>
+          <div class="status" id="status">Loading WASM engine…</div>
         </div>
       </div>
 
       <div class="main">
-        <!-- View mode controls -->
         <div class="view-controls" id="viewControls" style="display: none">
           <div>
             <button class="view-btn active" id="btnProxy">Fit (Proxy)</button>
             <button class="view-btn" id="btnLoupe">100% (Loupe)</button>
           </div>
-          <span class="view-hint" id="viewHint"
-            >Click image to inspect 100% details</span
-          >
+          <span class="view-hint" id="viewHint">Click image to inspect 100% details</span>
         </div>
 
         <div class="preview-container">
-          <img id="preview" alt="Preview" />
+          <canvas id="preview" aria-label="Preview canvas"></canvas>
           <div class="placeholder" id="placeholder">
             <svg viewBox="0 0 24 24">
               <path
@@ -536,290 +525,11 @@
             </svg>
             <p>Upload an image to start processing</p>
           </div>
+          <div class="loading-overlay" id="loadingOverlay">Loading preview…</div>
         </div>
       </div>
     </div>
 
-    <script>
-      let sessionId = null;
-      let previewTimeout = null;
-      let viewMode = "proxy";
-      let loupeX = 0.5;
-      let loupeY = 0.5;
-
-      const uploadArea = document.getElementById("uploadArea");
-      const fileInput = document.getElementById("fileInput");
-      const preview = document.getElementById("preview");
-      const placeholder = document.getElementById("placeholder");
-      const controls = document.getElementById("controls");
-      const exportBtn = document.getElementById("exportBtn");
-      const status = document.getElementById("status");
-      const btnProxy = document.getElementById("btnProxy");
-      const btnLoupe = document.getElementById("btnLoupe");
-      const viewControls = document.getElementById("viewControls");
-      const viewHint = document.getElementById("viewHint");
-
-      const sliders = [
-        "size",
-        "intensity",
-        "crystalSharpness",
-        "layers",
-        "shadowGrain",
-        "midtoneGrain",
-        "highlightGrain",
-        "tonalSmoothness",
-        "saturation",
-        "exposure",
-        "depth",
-        "chromatic",
-        "relief",
-      ];
-
-      function setViewMode(mode) {
-        viewMode = mode;
-        if (mode === "proxy") {
-          btnProxy.classList.add("active");
-          btnLoupe.classList.remove("active");
-          viewHint.textContent = "Click image to inspect 100% details";
-          preview.style.cursor = "crosshair";
-        } else {
-          btnLoupe.classList.add("active");
-          btnProxy.classList.remove("active");
-          viewHint.textContent = "Click to return to Fit view";
-          preview.style.cursor = "zoom-out";
-        }
-        updatePreview();
-      }
-
-      btnProxy.addEventListener("click", () => setViewMode("proxy"));
-      btnLoupe.addEventListener("click", () => setViewMode("loupe"));
-
-      preview.addEventListener("click", (e) => {
-        if (viewMode === "proxy") {
-          const rect = preview.getBoundingClientRect();
-          loupeX = (e.clientX - rect.left) / rect.width;
-          loupeY = (e.clientY - rect.top) / rect.height;
-          setViewMode("loupe");
-        } else {
-          setViewMode("proxy");
-        }
-      });
-
-      uploadArea.addEventListener("click", () => fileInput.click());
-
-      uploadArea.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        uploadArea.classList.add("dragover");
-      });
-
-      uploadArea.addEventListener("dragleave", () => {
-        uploadArea.classList.remove("dragover");
-      });
-
-      uploadArea.addEventListener("drop", (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove("dragover");
-        if (e.dataTransfer.files.length > 0) {
-          handleFile(e.dataTransfer.files[0]);
-        }
-      });
-
-      fileInput.addEventListener("change", (e) => {
-        if (e.target.files.length > 0) {
-          handleFile(e.target.files[0]);
-        }
-      });
-
-      async function handleFile(file) {
-        if (!file.type.startsWith("image/")) {
-          alert("Please upload an image file");
-          return;
-        }
-
-        status.textContent = "Uploading to engine...";
-
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-          const response = await fetch("/upload", {
-            method: "POST",
-            body: formData,
-          });
-
-          if (!response.ok) throw new Error("Upload failed");
-
-          const data = await response.json();
-          sessionId = data.sessionId;
-
-          status.textContent = `Ready. Target: ${data.width}×${data.height}`;
-
-          controls.style.display = "block";
-          viewControls.style.display = "flex";
-          placeholder.style.display = "none";
-          preview.style.display = "block";
-          uploadArea.style.display = "none";
-
-          preview.src = `/proxy/${sessionId}?t=${Date.now()}`;
-        } catch (e) {
-          status.textContent = "System error: " + e.message;
-          console.error(e);
-        }
-      }
-
-      sliders.forEach((id) => {
-        const slider = document.getElementById(id);
-        const valueDisplay = document.getElementById(id + "Value");
-
-        slider.addEventListener("input", () => {
-          delete slider.dataset.override;
-          valueDisplay.textContent = slider.value;
-          debouncePreview();
-        });
-
-        valueDisplay.addEventListener("click", () => {
-          const input = document.createElement("input");
-          input.type = "text";
-          input.className = "slider-value-input";
-          input.value = slider.value;
-          valueDisplay.replaceWith(input);
-          input.focus();
-          input.select();
-
-          function commit() {
-            let val = parseFloat(input.value);
-            if (isNaN(val)) val = parseFloat(slider.value);
-            const step = parseFloat(slider.step) || 1;
-            const decimals = (step.toString().split(".")[1] || "").length;
-            val = parseFloat(val.toFixed(decimals));
-            slider.value = val;
-            slider.dataset.override = val;
-            valueDisplay.textContent = val;
-            input.replaceWith(valueDisplay);
-            debouncePreview();
-          }
-
-          input.addEventListener("blur", commit);
-          input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              input.blur();
-            }
-            if (e.key === "Escape") {
-              input.value = slider.value;
-              input.blur();
-            }
-          });
-        });
-      });
-
-      function debouncePreview() {
-        if (previewTimeout) clearTimeout(previewTimeout);
-        status.textContent = "Rendering...";
-        previewTimeout = setTimeout(updatePreview, 50);
-      }
-
-      function getVal(id) {
-        const el = document.getElementById(id);
-        return el.dataset.override !== undefined
-          ? parseFloat(el.dataset.override)
-          : parseFloat(el.value);
-      }
-
-      async function updatePreview() {
-        if (!sessionId) return;
-
-        const params = {
-          size: getVal("size"),
-          intensity: getVal("intensity"),
-          crystalSharpness: getVal("crystalSharpness"),
-          saturation: getVal("saturation"),
-          exposure: getVal("exposure"),
-          shadowGrain: getVal("shadowGrain"),
-          midtoneGrain: getVal("midtoneGrain"),
-          highlightGrain: getVal("highlightGrain"),
-          tonalSmoothness: getVal("tonalSmoothness"),
-          depth: getVal("depth"),
-          chromatic: getVal("chromatic"),
-          relief: getVal("relief"),
-          layers: parseInt(document.getElementById("layers").value),
-        };
-
-        try {
-          const url = `/preview/${sessionId}?mode=${viewMode}&x=${loupeX}&y=${loupeY}`;
-          const response = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(params),
-          });
-
-          if (!response.ok) throw new Error("Preview failed");
-
-          const blob = await response.blob();
-          const url2 = URL.createObjectURL(blob);
-
-          if (preview.src.startsWith("blob:")) {
-            URL.revokeObjectURL(preview.src);
-          }
-
-          preview.src = url2;
-          status.textContent = "Render complete.";
-        } catch (e) {
-          status.textContent = "Render failed: " + e.message;
-          console.error(e);
-        }
-      }
-
-      exportBtn.addEventListener("click", async () => {
-        if (!sessionId) return;
-
-        exportBtn.disabled = true;
-        status.textContent = "Processing full resolution...";
-
-        const params = {
-          size: getVal("size"),
-          intensity: getVal("intensity"),
-          crystalSharpness: getVal("crystalSharpness"),
-          saturation: getVal("saturation"),
-          exposure: getVal("exposure"),
-          shadowGrain: getVal("shadowGrain"),
-          midtoneGrain: getVal("midtoneGrain"),
-          highlightGrain: getVal("highlightGrain"),
-          tonalSmoothness: getVal("tonalSmoothness"),
-          depth: getVal("depth"),
-          chromatic: getVal("chromatic"),
-          relief: getVal("relief"),
-          layers: parseInt(document.getElementById("layers").value),
-        };
-
-        try {
-          const response = await fetch(`/export/${sessionId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(params),
-          });
-
-          if (!response.ok) throw new Error("Export failed");
-
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = "larm_export.png";
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-
-          status.textContent = "Export complete.";
-        } catch (e) {
-          status.textContent = "System error: " + e.message;
-          console.error(e);
-        } finally {
-          exportBtn.disabled = false;
-        }
-      });
-    </script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>
