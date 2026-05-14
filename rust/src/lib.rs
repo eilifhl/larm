@@ -1,12 +1,16 @@
 extern crate image;
-extern crate jni;
 extern crate noise;
+
+#[cfg(not(target_arch = "wasm32"))]
 extern crate rayon;
 
 use image::{GenericImageView, Rgb};
 use noise::{Fbm, NoiseFn, Perlin, SuperSimplex};
+
+#[cfg(not(target_arch = "wasm32"))]
 use rayon::prelude::*;
 
+#[repr(C)]
 pub struct ArtisticGrainConfig {
     size: f64,
     intensity: f64,
@@ -35,9 +39,7 @@ impl ArtisticGrainConfig {
 
 pub struct GrainEngine {
     layer_noises: Vec<Fbm<SuperSimplex>>,
-
     chromatic_noise: Perlin,
-
     relief_noise: Fbm<Perlin>,
 }
 
@@ -138,24 +140,19 @@ impl GrainEngine {
             let depth_scale = 1.0 + (1.0 - layer_depth_factor) * config.depth * 2.0;
 
             let layer_intensity = 0.5 + 0.5 * layer_depth_factor;
-
             let layer_sharpness = config.crystal_sharpness * (0.7 + 0.3 * layer_depth_factor);
 
             for channel in 0..3 {
                 let (offset_x, offset_y) = chromatic_offsets[channel];
-
                 let sample_x = (rot_x + offset_x) * depth_scale / (config.size * 2.5);
                 let sample_y = (rot_y + offset_y) * depth_scale / (config.size * 2.5);
 
                 let clump_noise = fbm.get([sample_x, sample_y]);
-
                 let grit_noise = fbm.get([sample_x * 3.0, sample_y * 3.0]);
-
                 let combined = clump_noise * 0.7 + grit_noise * 0.3;
 
                 let centered = combined * layer_sharpness;
                 let grain_raw = 1.0 / (1.0 + (-centered).exp());
-
                 channel_grains[channel] += (grain_raw - 0.5) * layer_intensity;
             }
         }
@@ -189,134 +186,163 @@ pub fn apply_3d_grain(
     }
 }
 
-fn process_grain<I>(
+fn render_pixel<I>(
+    grain_engine: &GrainEngine,
     base_image: &I,
     width: u32,
-    output_pixels: &mut [u8],
     config: &ArtisticGrainConfig,
+    index: usize,
+    pixel_out: &mut [u8],
 ) where
-    I: GenericImageView<Pixel = Rgb<u8>> + Sync,
+    I: GenericImageView<Pixel = Rgb<u8>>,
 {
-    output_pixels
-        .par_chunks_exact_mut(3)
-        .enumerate()
-        .for_each_init(
-            || GrainEngine::new(config.layers, 42),
-            |grain_3d, (index, pixel_out)| {
-                let x = (index as u32) % width;
-                let y = (index as u32) / width;
+    let x = (index as u32) % width;
+    let y = (index as u32) / width;
 
-                let original_pixel = base_image.get_pixel(x, y);
-                let luma = get_luma(&original_pixel);
+    let original_pixel = base_image.get_pixel(x, y);
+    let luma = get_luma(&original_pixel);
+    let channel_grains = grain_engine.sample(x as f64, y as f64, luma, config);
 
-                let x_f = x as f64;
-                let y_f = y as f64;
+    let tonal_intensity = config.get_tonal_grain_intensity(luma);
+    let effective_intensity = config.intensity * tonal_intensity;
 
-                let channel_grains = grain_3d.sample(x_f, y_f, luma, config);
+    let soft_light = |c: f64, g: f64| -> f64 {
+        if g < 0.5 {
+            c - (1.0 - 2.0 * g) * c * (1.0 - c)
+        } else {
+            c + (2.0 * g - 1.0)
+                * ((if c <= 0.25 {
+                    ((16.0 * c - 12.0) * c + 4.0) * c
+                } else {
+                    c.sqrt()
+                }) - c)
+        }
+    };
 
-                let tonal_intensity = config.get_tonal_grain_intensity(luma);
-                let effective_intensity = config.intensity * tonal_intensity;
+    let exposure_mult = 2.0_f64.powf(config.exposure);
+    let mut rgb_f = [0.0; 3];
 
-                let soft_light = |c: f64, g: f64| -> f64 {
-                    if g < 0.5 {
-                        c - (1.0 - 2.0 * g) * c * (1.0 - c)
-                    } else {
-                        c + (2.0 * g - 1.0)
-                            * ((if c <= 0.25 {
-                                ((16.0 * c - 12.0) * c + 4.0) * c
-                            } else {
-                                c.sqrt()
-                            }) - c)
-                    }
-                };
+    for i in 0..3 {
+        let c_orig = original_pixel[i] as f64 / 255.0;
+        let grain_shape = 0.5 + channel_grains[i] * effective_intensity;
+        let grained = soft_light(c_orig, grain_shape);
+        rgb_f[i] = (grained * exposure_mult).clamp(0.0, 1.0);
+    }
 
-                let exposure_mult = 2.0_f64.powf(config.exposure);
-                let mut rgb_f = [0.0; 3];
+    let out_luma = 0.2126 * rgb_f[0] + 0.7152 * rgb_f[1] + 0.0722 * rgb_f[2];
+    let r = (out_luma + config.saturation * (rgb_f[0] - out_luma)).clamp(0.0, 1.0);
+    let g = (out_luma + config.saturation * (rgb_f[1] - out_luma)).clamp(0.0, 1.0);
+    let b = (out_luma + config.saturation * (rgb_f[2] - out_luma)).clamp(0.0, 1.0);
 
-                for i in 0..3 {
-                    let c_orig = original_pixel[i] as f64 / 255.0;
-
-                    let grain_shape = 0.5 + channel_grains[i] * effective_intensity;
-                    let grained = soft_light(c_orig, grain_shape);
-
-                    rgb_f[i] = (grained * exposure_mult).clamp(0.0, 1.0);
-                }
-
-                let out_luma = 0.2126 * rgb_f[0] + 0.7152 * rgb_f[1] + 0.0722 * rgb_f[2];
-                let r = (out_luma + config.saturation * (rgb_f[0] - out_luma)).clamp(0.0, 1.0);
-                let g = (out_luma + config.saturation * (rgb_f[1] - out_luma)).clamp(0.0, 1.0);
-                let b = (out_luma + config.saturation * (rgb_f[2] - out_luma)).clamp(0.0, 1.0);
-
-                pixel_out[0] = (r * 255.0) as u8;
-                pixel_out[1] = (g * 255.0) as u8;
-                pixel_out[2] = (b * 255.0) as u8;
-            },
-        );
+    pixel_out[0] = (r * 255.0) as u8;
+    pixel_out[1] = (g * 255.0) as u8;
+    pixel_out[2] = (b * 255.0) as u8;
 }
 
-use jni::objects::{JByteBuffer, JClass};
-use jni::sys::{jdouble, jint};
-use jni::EnvUnowned;
+fn process_grain<I>(base_image: &I, width: u32, output_pixels: &mut [u8], config: &ArtisticGrainConfig)
+where
+    I: GenericImageView<Pixel = Rgb<u8>> + Sync,
+{
+    #[cfg(target_arch = "wasm32")]
+    {
+        let grain_engine = GrainEngine::new(config.layers, 42);
+        for (index, pixel_out) in output_pixels.chunks_exact_mut(3).enumerate() {
+            render_pixel(&grain_engine, base_image, width, config, index, pixel_out);
+        }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        output_pixels
+            .par_chunks_exact_mut(3)
+            .enumerate()
+            .for_each_init(
+                || GrainEngine::new(config.layers, 42),
+                |grain_engine, (index, pixel_out)| {
+                    render_pixel(grain_engine, base_image, width, config, index, pixel_out);
+                },
+            );
+    }
+}
+
+fn rgb_len(width: u32, height: u32) -> Option<usize> {
+    width.checked_mul(height)?.checked_mul(3)?.try_into().ok()
+}
 
 #[unsafe(no_mangle)]
-pub extern "system" fn Java_io_github_eilifhl_larm_GrainProcessor_applyGrain<'local>(
-    mut env_unowned: EnvUnowned<'local>,
-    _class: JClass<'local>,
-    input_buf: JByteBuffer<'local>,
-    output_buf: JByteBuffer<'local>,
-    width: jint,
-    height: jint,
+pub extern "C" fn alloc_buffer(len: usize) -> *mut u8 {
+    let mut buffer = Vec::<u8>::with_capacity(len);
+    let ptr = buffer.as_mut_ptr();
+    std::mem::forget(buffer);
+    ptr
+}
 
-    // ArtisticGrainConfig
-    size: jdouble,
-    intensity: jdouble,
-    crystal_sharpness: jdouble,
-    saturation: jdouble,
-    exposure: jdouble,
-    shadow_grain: jdouble,
-    midtone_grain: jdouble,
-    highlight_grain: jdouble,
-    tonal_smoothness: jdouble,
-    depth: jdouble,
-    chromatic: jdouble,
-    relief: jdouble,
-    layers: jint,
-) {
-    env_unowned
-        .with_env(|env| -> jni::errors::Result<()> {
-            let input_ptr = env.get_direct_buffer_address(&input_buf)?;
-            let input_len = env.get_direct_buffer_capacity(&input_buf)?;
-            let input_slice = unsafe { std::slice::from_raw_parts(input_ptr, input_len) };
+#[unsafe(no_mangle)]
+pub extern "C" fn free_buffer(ptr: *mut u8, len: usize) {
+    if ptr.is_null() || len == 0 {
+        return;
+    }
 
-            let output_ptr = env.get_direct_buffer_address(&output_buf)?;
-            let output_len = env.get_direct_buffer_capacity(&output_buf)?;
-            let output_slice = unsafe { std::slice::from_raw_parts_mut(output_ptr, output_len) };
+    unsafe {
+        drop(Vec::from_raw_parts(ptr, len, len));
+    }
+}
 
-            let config = ArtisticGrainConfig {
-                size: size as f64,
-                intensity: intensity as f64,
-                crystal_sharpness: crystal_sharpness as f64,
-                saturation: saturation as f64,
-                exposure: exposure as f64,
-                shadow_grain: shadow_grain as f64,
-                midtone_grain: midtone_grain as f64,
-                highlight_grain: highlight_grain as f64,
-                tonal_smoothness: tonal_smoothness as f64,
-                depth: depth as f64,
-                chromatic: chromatic as f64,
-                relief: relief as f64,
-                layers: layers as u32,
-            };
+#[unsafe(no_mangle)]
+pub extern "C" fn apply_grain_buffer(
+    input_ptr: *const u8,
+    input_len: usize,
+    output_ptr: *mut u8,
+    output_len: usize,
+    width: u32,
+    height: u32,
+    size: f64,
+    intensity: f64,
+    crystal_sharpness: f64,
+    saturation: f64,
+    exposure: f64,
+    shadow_grain: f64,
+    midtone_grain: f64,
+    highlight_grain: f64,
+    tonal_smoothness: f64,
+    depth: f64,
+    chromatic: f64,
+    relief: f64,
+    layers: u32,
+) -> i32 {
+    let Some(expected_len) = rgb_len(width, height) else {
+        return 1;
+    };
 
-            apply_3d_grain(
-                width as u32,
-                height as u32,
-                input_slice,
-                output_slice,
-                &config,
-            );
+    if input_ptr.is_null()
+        || output_ptr.is_null()
+        || input_len != expected_len
+        || output_len != expected_len
+    {
+        return 2;
+    }
 
-            Ok(())
-        })
-        .resolve::<jni::errors::ThrowRuntimeExAndDefault>();
+    let config = ArtisticGrainConfig {
+        size,
+        intensity,
+        crystal_sharpness,
+        saturation,
+        exposure,
+        shadow_grain,
+        midtone_grain,
+        highlight_grain,
+        tonal_smoothness,
+        depth,
+        chromatic,
+        relief,
+        layers,
+    };
+
+    let result = std::panic::catch_unwind(|| unsafe {
+        let input_slice = std::slice::from_raw_parts(input_ptr, input_len);
+        let output_slice = std::slice::from_raw_parts_mut(output_ptr, output_len);
+        apply_3d_grain(width, height, input_slice, output_slice, &config);
+    });
+
+    if result.is_ok() { 0 } else { 3 }
 }

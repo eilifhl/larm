@@ -1,0 +1,11 @@
+{
+  "name": "larm",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "build:wasm": "cargo build --manifest-path rust/Cargo.toml --target wasm32-unknown-unknown --release",
+    "build:web": "node scripts/build.mjs",
+    "build": "npm run build:wasm && npm run build:web",
+    "dev": "npm run build && python3 -m http.server 8080 -d dist"
+  }
+}
