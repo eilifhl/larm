@@ -119,9 +119,11 @@ function setViewMode(mode) {
 
 function getVal(id) {
   const el = document.getElementById(id);
-  return el.dataset.override !== undefined
-    ? Number.parseFloat(el.dataset.override)
-    : Number.parseFloat(el.value);
+  return Number.parseFloat(el.value);
+}
+
+function syncSliderValueDisplay(slider, valueDisplay) {
+  valueDisplay.textContent = slider.value;
 }
 
 function getParams() {
@@ -471,9 +473,10 @@ sliders.forEach((id) => {
   const slider = document.getElementById(id);
   const valueDisplay = document.getElementById(`${id}Value`);
 
+  syncSliderValueDisplay(slider, valueDisplay);
+
   slider.addEventListener("input", () => {
-    delete slider.dataset.override;
-    valueDisplay.textContent = slider.value;
+    syncSliderValueDisplay(slider, valueDisplay);
     debouncePreview();
   });
 
@@ -496,8 +499,7 @@ sliders.forEach((id) => {
       const decimals = (step.toString().split(".")[1] || "").length;
       val = Number.parseFloat(val.toFixed(decimals));
       slider.value = `${val}`;
-      slider.dataset.override = `${val}`;
-      valueDisplay.textContent = `${val}`;
+      syncSliderValueDisplay(slider, valueDisplay);
       input.replaceWith(valueDisplay);
       debouncePreview();
     }
